@@ -73,6 +73,7 @@
     <Compile Include="Bot\Behaviors\Misc\Items\LowLevelLogic.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Bot\Cache\Ability\Abilities\AbilityExtensions.cs" />
     <Compile Include="Bot\Cache\Ability\Abilities\Barb\AncientSpear.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -630,6 +631,7 @@
     </Compile>
     <Compile Include="CombatRoutine\CombatRoutine.cs" />
     <Compile Include="CombatRoutine\RoutineDebug.cs" />
+    <Compile Include="Config\FunkySettingsExtensions.cs" />
     <Compile Include="Enums\AvoidanceType.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -814,12 +816,11 @@
     <None Include="ItemRules\Rules\translation.dis">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Demonbuddy">
-      <HintPath>..\..\..\..\Desktop\DB_DebugCopy\Demonbuddy.exe</HintPath>
-      <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>Assemblies\Demonbuddy.exe</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

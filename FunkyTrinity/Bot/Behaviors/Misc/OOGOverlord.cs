@@ -1,8 +1,9 @@
 ﻿using System;
 using Zeta;
 using Zeta.Common;
+using Zeta.CommonBot;
 using Zeta.TreeSharp;
-using Action=Zeta.TreeSharp.Action;
+using Action = Zeta.TreeSharp.Action;
 
 namespace FunkyTrinity
 {
@@ -59,76 +60,82 @@ namespace FunkyTrinity
 				return false;
 		  }
 
-		  public static RunStatus OutOfGameBehavior(object ret)
-		  {
-				if (Bot.SettingsFunky.EnableCoffeeBreaks&&AFKBreak)
-				{
-					 if (DateTime.Now.Subtract(BreakStart).TotalMinutes>=BreakMinutes)
-					 {
-						  //Finished.
-						  Logger.Write(LogLevel.OutOfGame, "Afk Break Finished..");
-						  AFKBreak=false;
-						  LastBreak=DateTime.Now;
-						  return RunStatus.Success;
-					 }
+          public static RunStatus OutOfGameBehavior(object ret)
+          {
 
-					 return RunStatus.Running;
-				}
-				else if (MuleBehavior)
-				{
-					 if (!InitMuleBehavior)
-					 {
-						  InitMuleBehavior=true;
-						  NewMuleGame.BotHeroName=ZetaDia.Service.CurrentHero.Name;
-						  NewMuleGame.BotHeroIndex=0;
-						  NewMuleGame.LastProfile=Zeta.CommonBot.ProfileManager.CurrentProfile.Path;
-						  NewMuleGame.LastHandicap=Zeta.CommonBot.Settings.CharacterSettings.Instance.MonsterPowerLevel;
-					 }
+              if (Bot.SettingsFunky.ShouldBotStop())
+              {
+                  BotMain.Stop();
+              }
 
-					 if (!CreatedCharacter)
-					 {
-						  RunStatus NewHeroStatus=D3Character.CreateNewHero();
+              if (Bot.SettingsFunky.EnableCoffeeBreaks && AFKBreak)
+              {
+                  if (DateTime.Now.Subtract(BreakStart).TotalMinutes >= BreakMinutes)
+                  {
+                      //Finished.
+                      Logger.Write(LogLevel.OutOfGame, "Afk Break Finished..");
+                      AFKBreak = false;
+                      LastBreak = DateTime.Now;
+                      return RunStatus.Success;
+                  }
 
-						  if (NewHeroStatus==RunStatus.Success)
-						  {
-								CreatedCharacter=true;
-								//Setup Settings
-								Bot.UpdateCurrentAccountDetails();
-								Settings_Funky.LoadFunkyConfiguration();
-						  }
-						  return RunStatus.Running;
-					 }
-					 else if (!RanProfile)
-					 {
-						  RunStatus NewGameStatus=NewMuleGame.BeginNewGameProfile();
-						  if (NewGameStatus==RunStatus.Success)
-						  {
-								RanProfile=true;
-								return RunStatus.Success;
-						  }
-						  return RunStatus.Running;
-					 }
-					 else if(!Finished)
-					 {
-						  RunStatus FinishStatus=NewMuleGame.FinishMuleBehavior();
-						  if (FinishStatus==RunStatus.Success)
-						  {
-								Finished=true;
-								RanProfile=false;
-								CreatedCharacter=false;
-								InitMuleBehavior=false;
-								MuleBehavior=false;
-								//Load Settings
-								Bot.UpdateCurrentAccountDetails();
-								Settings_Funky.LoadFunkyConfiguration();
+                  return RunStatus.Running;
+              }
+              else if (MuleBehavior)
+              {
+                  if (!InitMuleBehavior)
+                  {
+                      InitMuleBehavior = true;
+                      NewMuleGame.BotHeroName = ZetaDia.Service.CurrentHero.Name;
+                      NewMuleGame.BotHeroIndex = 0;
+                      NewMuleGame.LastProfile = Zeta.CommonBot.ProfileManager.CurrentProfile.Path;
+                      NewMuleGame.LastHandicap = Zeta.CommonBot.Settings.CharacterSettings.Instance.MonsterPowerLevel;
+                  }
 
-								return RunStatus.Success;
-						  }
-						  return RunStatus.Running;
-					 }
-				}
+                  if (!CreatedCharacter)
+                  {
+                      RunStatus NewHeroStatus = D3Character.CreateNewHero();
 
-				return RunStatus.Success;
-		  }
+                      if (NewHeroStatus == RunStatus.Success)
+                      {
+                          CreatedCharacter = true;
+                          //Setup Settings
+                          Bot.UpdateCurrentAccountDetails();
+                          Settings_Funky.LoadFunkyConfiguration();
+                      }
+                      return RunStatus.Running;
+                  }
+                  else if (!RanProfile)
+                  {
+                      RunStatus NewGameStatus = NewMuleGame.BeginNewGameProfile();
+                      if (NewGameStatus == RunStatus.Success)
+                      {
+                          RanProfile = true;
+                          return RunStatus.Success;
+                      }
+                      return RunStatus.Running;
+                  }
+                  else if (!Finished)
+                  {
+                      RunStatus FinishStatus = NewMuleGame.FinishMuleBehavior();
+                      if (FinishStatus == RunStatus.Success)
+                      {
+                          Finished = true;
+                          RanProfile = false;
+                          CreatedCharacter = false;
+                          InitMuleBehavior = false;
+                          MuleBehavior = false;
+                          //Load Settings
+                          Bot.UpdateCurrentAccountDetails();
+                          Settings_Funky.LoadFunkyConfiguration();
+
+                          return RunStatus.Success;
+                      }
+                      return RunStatus.Running;
+                  }
+              }
+
+              return RunStatus.Success;
+          }
 	 }
 }
