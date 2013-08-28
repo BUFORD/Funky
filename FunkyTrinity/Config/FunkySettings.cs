@@ -8,8 +8,6 @@ namespace FunkyTrinity
 {
     public partial class Funky
     {
-
-
         public class Settings_Funky
         {
             public DateTime? BotStopTime { get; set; }
@@ -271,11 +269,7 @@ namespace FunkyTrinity
                 StopGameScreenShotWindowWidth = 1000;
                 StopGameScreenShotWindowHeight = 800;
 
-                MissleDampeningEnforceCloseRange = true;
-                Logging.Write("BotStopTime DetermineBotStopTime From constructor");
-                DetermineBotStopTime();
-                BotMain.OnStart += BotMain_OnStart;
-                BotMain.OnStop += BotMain_OnStop;
+                MissleDampeningEnforceCloseRange = true;                           
                 Class = new ClassSettings();
             }
 
@@ -341,6 +335,7 @@ namespace FunkyTrinity
                 }
 
                 Bot.SettingsFunky = Settings_Funky.DeserializeFromXML();
+                Bot.SettingsFunky.DetermineBotStopTime();
             }
             public static void SerializeToXML(Settings_Funky settings)
             {
@@ -360,22 +355,10 @@ namespace FunkyTrinity
                 return settings;
             }
 
-            void BotMain_OnStart(IBot bot)
-            {
-                Logging.Write("BotStopTime DetermineBotStopTime From on start event");
-                DetermineBotStopTime();
-            }
-
-            void BotMain_OnStop(IBot bot)
-            {
-                Logging.Write("BotStopTime set to null");
-                BotStopTime = null;
-            }
-
-            private void DetermineBotStopTime()
+            public void DetermineBotStopTime()
             {
                 //modify this to whatever time you want bot to stop on a daily basis
-                var fourAM = DateTime.Today.AddHours(3).AddMinutes(50);
+                var fourAM = DateTime.Today.AddHours(3).AddMinutes(45);
                 if (DateTime.Now < fourAM)
                 {
                     BotStopTime = fourAM;
@@ -384,7 +367,7 @@ namespace FunkyTrinity
                 {
                     BotStopTime = fourAM.AddDays(1);
                 }
-
+                
                 Logging.Write(string.Format("BotStopTime: {0}", BotStopTime));
             }
         }
