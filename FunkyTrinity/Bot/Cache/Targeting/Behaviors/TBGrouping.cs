@@ -102,7 +102,8 @@ namespace FunkyTrinity.Targeting.Behaviors
 		  {
 				var PossibleGroups=clusters
 						  .Where(c =>
-								(!FunkyTrinity.Bot.SettingsFunky.IgnoreAboveAverageMobs&&(c.Info.Properties.HasFlag(ClusterProperties.Elites))||c.Info.Properties.HasFlag(ClusterProperties.Boss))||
+								(!FunkyTrinity.Bot.SettingsFunky.IgnoreAboveAverageMobs
+                                &&(c.Info.Properties.HasFlag(ClusterProperties.Elites))||c.Info.Properties.HasFlag(ClusterProperties.Boss))||
 								c.Info.Properties.HasFlag(ClusterProperties.Large)||
 								c.Info.Properties.HasFlag(ClusterProperties.Strong)||
 								c.Info.Properties.HasFlag(ClusterProperties.Ranged)||
