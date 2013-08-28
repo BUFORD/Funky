@@ -16,6 +16,16 @@ namespace FunkyTrinity
 	 {
 		  internal partial class FunkyWindow
          {
+				 private void FunkyLogLevelChanged(object sender, EventArgs e)
+				 {
+					  CheckBox cbSender=(CheckBox)sender;
+					  LogLevel LogLevelValue= (LogLevel)Enum.Parse(typeof(LogLevel),cbSender.Name);
+
+					  if (Bot.SettingsFunky.FunkyLogFlags.HasFlag(LogLevelValue))
+							Bot.SettingsFunky.FunkyLogFlags&=LogLevelValue;
+					  else
+							Bot.SettingsFunky.FunkyLogFlags|=LogLevelValue;
+			    }
 
              private void DebugButtonClicked(object sender, EventArgs e)
              {
@@ -952,14 +962,6 @@ namespace FunkyTrinity
              {
                  Bot.SettingsFunky.DebugStatusBar = !Bot.SettingsFunky.DebugStatusBar;
              }
-             private void LogSafeMovementOutputChecked(object sender, EventArgs e)
-             {
-                 Bot.SettingsFunky.LogSafeMovementOutput = !Bot.SettingsFunky.LogSafeMovementOutput;
-             }
-				 private void LogGroupingOutputChecked(object sender, EventArgs e)
-				 {
-					  Bot.SettingsFunky.LogGroupingOutput=!Bot.SettingsFunky.LogGroupingOutput;
-				 }
 				 private void SkipAheadChecked(object sender, EventArgs e)
 				 {
 					  Bot.SettingsFunky.SkipAhead=!Bot.SettingsFunky.SkipAhead;
