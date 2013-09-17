@@ -59,7 +59,7 @@ namespace FunkyTrinity.Cache
 							 if (Name.StartsWith("woodwraith_sporecloud_emitter")) return AvoidanceType.TreeSpore;
 						}
 
-						return AvoidanceType.Unknown;
+						return AvoidanceType.None;
 				 }
 
 				 internal static AvoidanceType FindAvoidanceUsingSNOID(int SNOID)
@@ -111,7 +111,7 @@ namespace FunkyTrinity.Cache
 							 case 164829:
 									return AvoidanceType.SuccubusProjectile;
 						}
-						return AvoidanceType.Unknown;
+						return AvoidanceType.None;
 				 }
 
 
@@ -178,7 +178,8 @@ namespace FunkyTrinity.Cache
             181504, 91688, 3007, 3011, 3014, 130858, 131573, 214396, 182730, 226087, 141639, 206569, 15119, 54413, 54926, 2979, 56416, 53802, 5776, 3949, 
             108490, 52833, 3341, 4482, 188129, 188127, 55259, 54693, 3689, 131494, 3609, 225589, 171635, 3948,5739, 185949, 182697, 200371,
 				75023,54972,73260,172810,225567,225565, 225566, 
-				206461,61459,63114,53853,54331,53957,54379,199337,
+				206461,61459,63114,53853,54331,53957,54379,199337,5900,5744,5902,85690,
+				182526,
          };
 
 
@@ -727,10 +728,9 @@ namespace FunkyTrinity.Cache
             {56686, 4}, {52685, 4}, {54850, 14},  {54882, 40}, {54908, 4},
          };
 				 // 174900 = fire-spewers (demonic forge) in Act 3, 54908 = iron gates  58379 = a2_desolate_large_bones
-				 // Navigation obstacles for standard navigation down dungeons etc. to help DB movement
-				 // MAKE SURE you add the *SAME* SNO to the "size" dictionary below, and include a reasonable size (keep it smaller rather than larger) for the SNO.
+			  // 3048 = a2 zolt dungeon "sand wall" door, 200872 = a3dunRmpt_Interactives_signal_fire_A_Prop
 			  public static HashSet<int> hashSNONavigationObstacles=new HashSet<int> {
-            174900, 191459, 58379, 204168, 3341, 185391, 123325, 
+            174900, 191459, 58379, 204168, 3341, 185391, 123325, 196211, 3048, 200872,
         };
 				 // Destructible things that are very large and need breaking at a bigger distance - eg logstacks, large crates, carts, etc.
 				 internal static readonly Dictionary<int, int> dictSNOExtendedDestructRange=new Dictionary<int, int> { 
@@ -739,6 +739,7 @@ namespace FunkyTrinity.Cache
 				 // Destructible things that need targeting by a location instead of an ACDGUID (stuff you can't "click on" to destroy in-game)
 			  public static readonly HashSet<int> hashDestructableLocationTarget=new HashSet<int> { 
             170657, 116409, 121586, 3016, 121586,80231,58559,58962,62562,54477,54191,53957,54446,54477,53999,54191,54025,
+				98910,
          };
 
 				 // A list of all the SNO's to avoid - you could add 

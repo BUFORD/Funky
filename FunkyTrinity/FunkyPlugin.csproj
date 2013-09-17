@@ -447,6 +447,12 @@
     <Compile Include="Bot\Cache\Ability\ConditionObjects\AbilityUsablityTests.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Bot\Cache\Ability\ConditionObjects\LOSConditions.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Bot\Cache\Ability\ConditionObjects\LOSInfo.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Bot\Cache\Ability\Enums\AbilityUsage.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -480,25 +486,31 @@
     <Compile Include="Bot\Cache\Ability\Abilities\WeaponInstantRanged.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\DemonHunter.cs">
+    <Compile Include="Bot\Cache\AvoidanceValue.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\Monk.cs">
+    <Compile Include="Bot\Cache\Player\DemonHunter.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\Player.cs">
+    <Compile Include="Bot\Cache\Player\Monk.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\WitchDoctor.cs">
+    <Compile Include="Bot\Cache\Player\Player.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\Wizard.cs">
+    <Compile Include="Bot\Cache\Player\WitchDoctor.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Bot\Cache\Player\Wizard.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Navigation\GridPoint\QuadrantLocation.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Targeting\Behaviors\TargetBehavioralTypes.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Bot\Cache\Targeting\Behaviors\TBLOSMovement.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Targeting\TargetHandler.cs">
@@ -519,7 +531,7 @@
     <Compile Include="Bot\Cache\Navigation\Objects\AreaBoundary.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\Navigation\MovementBackTrack.cs">
+    <Compile Include="Bot\Cache\Navigation\Cache\MovementBackTrack.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Navigation\GridPoint\GPArea.cs">
@@ -534,13 +546,13 @@
     <Compile Include="Bot\Cache\Navigation\GridPoint\GPRectangle.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Behaviors\Navigation\TargetMovement.cs">
+    <Compile Include="Bot\Cache\Navigation\TargetMovement.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\Navigation\Navigation.cs">
+    <Compile Include="Bot\Cache\Navigation\Cache\Navigation.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\BotCache\Player Class\Barb.cs">
+    <Compile Include="Bot\Cache\Player\Barb.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Behaviors\Townrun\UnidOverlord.cs">
@@ -561,16 +573,13 @@
     <Compile Include="Bot\Cache\Navigation\Clustering\ClusterCollection.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\Navigation\Objects\SkipAhead.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="Bot\Cache\BotCache\CombatCache.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\BotCache\Stats.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\ObjectCache\Blacklisting.cs">
+    <Compile Include="Bot\Cache\Blacklisting.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\ObjectCache\Collection\Objects.cs">
@@ -603,7 +612,7 @@
     <Compile Include="Bot\Cache\ObjectCache\Objects\CacheUnit.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Cache\Navigation\MovementSkipAhead.cs">
+    <Compile Include="Bot\Cache\Navigation\Cache\MovementSkipAhead.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Targeting\Behaviors\TargetBehavior.cs">
@@ -630,6 +639,78 @@
     <Compile Include="CombatRoutine\CombatRoutine.cs" />
     <Compile Include="CombatRoutine\RoutineDebug.cs" />
     <Compile Include="Config\FunkySettingsExtensions.cs" />
+    <Compile Include="CombatRoutine\CombatRoutine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CombatRoutine\RoutineDebug.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Config\Settings\SettingAvoidance.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingCluster.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingCombat.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingDebug.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingDemonBuddy.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingFleeing.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingGrouping.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingItemRules.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingLoot.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingRanges.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Settings\SettingTargeting.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Avoidances.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Clustering.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Combat.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\General.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Grouping.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\ItemRules.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Pickup.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\PlayerClass.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Ranges.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Scoring.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\Tabs\Targeting.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Enums\AvoidanceType.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -684,9 +765,6 @@
     <Compile Include="XML\IfSNOInRangeTag.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="XML\LoadProfileOnce.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="XML\NextProfileTag.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -739,6 +817,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="XML\TrinityResetAllTag.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="XML\TrinityTownPortal.cs">
+      <SubType>Code</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="XML\TrinityTownRunTag.cs">
@@ -816,9 +898,13 @@
     <Reference Include="Demonbuddy">
       <HintPath>Assemblies\Demonbuddy.exe</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Web" />
@@ -827,6 +913,7 @@
     <Reference Include="System.Windows.Presentation" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -851,7 +938,7 @@
     <Compile Include="Bot\Behaviors\Misc\OOGOverlord.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Bot\Behaviors\Navigation\PlayerMover.cs">
+    <Compile Include="Bot\Cache\Navigation\PlayerMover.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\Navigation\Objects\DirectionPoint.cs">
@@ -896,7 +983,7 @@
     <Compile Include="Bot\Cache\CacheIDLookup.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Config\Avoidance.cs">
+    <Compile Include="Bot\Cache\Avoidance.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Bot\Cache\ObjectCache\ObjectCache.cs">
@@ -920,7 +1007,7 @@
     <Compile Include="Config\FunkyWindow.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Config\FunkySettings.cs">
+    <Compile Include="Config\Settings\FunkySettings.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Config\FunkyWindowEvents.cs">
@@ -992,6 +1079,45 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Bot\Cache\Ability\_About Abilities.txt" />
+    <Content Include="Config\Defaults\InfernoMelee.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\InfernoRanged.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Clustering_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Avoidance_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Combat_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Demonbuddy_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Debug_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Targeting_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\ItemRules_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Range_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Loot_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Fleeing_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Defaults\Specific\Grouping_Default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Treehooks.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

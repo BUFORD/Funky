@@ -160,7 +160,7 @@ namespace FunkyTrinity.Targeting
 					 {
 						  Zeta.CommonBot.GameEvents.FireItemLooted(CurrentTarget.AcdGuid.Value);
 
-						  if (FunkyTrinity.Bot.SettingsFunky.DebugStatusBar) BotMain.StatusText=statusText;
+						  if (FunkyTrinity.Bot.SettingsFunky.Debug.DebugStatusBar) BotMain.StatusText=statusText;
 
 						  //This is where we should manipulate information of both what dropped and what was looted.
 						  Funky.LogItemInformation();
@@ -221,7 +221,7 @@ namespace FunkyTrinity.Targeting
 						  if (!FunkyTrinity.Bot.Combat.reCheckedFinished)
 						  {
 								statusText+=" RECHECKING";
-								if (FunkyTrinity.Bot.SettingsFunky.DebugStatusBar)
+								if (FunkyTrinity.Bot.SettingsFunky.Debug.DebugStatusBar)
 								{
 									 BotMain.StatusText=statusText;
 								}
@@ -336,7 +336,7 @@ namespace FunkyTrinity.Targeting
 								// PREVENT blacklisting a monster on less than 90% health unless we haven't damaged it for more than 2 minutes
 								if (CurrentTarget.targetType.Value==TargetType.Unit)
 								{
-									 if (CurrentTarget.IsTreasureGoblin&&FunkyTrinity.Bot.SettingsFunky.GoblinPriority>=3) bBlacklistThis=false;
+									 if (CurrentTarget.IsTreasureGoblin&&FunkyTrinity.Bot.SettingsFunky.Targeting.GoblinPriority>=3) bBlacklistThis=false;
 									 if (DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.dateSincePickedTarget).TotalSeconds<=120) bBlacklistThis=false;
 								}
 
@@ -382,16 +382,18 @@ namespace FunkyTrinity.Targeting
 					 //Update CurrentUnitTarget Variable.
 					 if (CurrentUnitTarget==null) CurrentUnitTarget=(CacheUnit)CurrentTarget;
 
-					 double HealthChangeMS=DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.LastHealthChange).TotalMilliseconds;
+					 
 
-					 if (HealthChangeMS>3000&&!CurrentTarget.ObjectIsSpecial||HealthChangeMS>6000)
-					 {
-						  Logger.Write(LogLevel.Target, "Health change has not occured within 3 seconds for unit {0}", CurrentTarget.InternalName);
-						  FunkyTrinity.Bot.Combat.bForceTargetUpdate=true;
-						  CurrentState=RunStatus.Running;
-						  CurrentTarget.BlacklistLoops=10;
-						  return false;
-					 }
+					 //double HealthChangeMS=DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.LastHealthChange).TotalMilliseconds;
+
+					 //if (HealthChangeMS>3000&&!CurrentTarget.ObjectIsSpecial||HealthChangeMS>6000)
+					 //{
+					 //	 Logger.Write(LogLevel.Target, "Health change has not occured within 3 seconds for unit {0}", CurrentTarget.InternalName);
+					 //	 Bot.Combat.bForceTargetUpdate=true;
+					 //	 CurrentState=RunStatus.Running;
+					 //	 CurrentTarget.BlacklistLoops=10;
+					 //	 return false;
+					 //}
 				}
 
 
@@ -408,11 +410,20 @@ namespace FunkyTrinity.Targeting
 					 FunkyTrinity.Bot.Combat.bPickNewAbilities=false;
 					 if (CurrentTarget.targetType.Value==TargetType.Unit&&CurrentTarget.AcdGuid.HasValue)
 					 {
-						  // Pick a suitable Ability			
-						  if (CurrentUnitTarget.IsClusterException)
-								FunkyTrinity.Bot.Combat.powerPrime=FunkyTrinity.Bot.Class.AbilitySelector(false, false, ConditionCriteraTypes.SingleTarget);
-						  else
-								FunkyTrinity.Bot.Combat.powerPrime=FunkyTrinity.Bot.Class.AbilitySelector(false, false);
+						  // Pick an Ability		
+						  Ability nextAbility=FunkyTrinity.Bot.Class.AbilitySelector(CurrentUnitTarget);
+
+						  // Did we get default attack?
+						  if (nextAbility.Equals(Bot.Class.DefaultAttack)&&!Bot.Class.CanUseDefaultAttack)
+						  {
+								Logger.Write(LogLevel.Ability, "Failed to find a valid ability to use -- Target: {0}", Bot.Target.CurrentTarget.InternalName);
+								FunkyTrinity.Bot.Combat.bForceTargetUpdate=true;
+								CurrentState=RunStatus.Running;
+								CurrentTarget.BlacklistLoops=10;
+								return false;
+						  }
+
+						  FunkyTrinity.Bot.Combat.powerPrime=nextAbility;
 					 }
 
 					 // Select an Ability for destroying a destructible with in advance
@@ -472,40 +483,33 @@ namespace FunkyTrinity.Targeting
 
 		  public virtual bool Movement()
 		  {
-				// Set current destination to our current target's destination
-				TargetMovement.CurrentTargetLocation=CurrentTarget.Position;
-				if (CurrentTarget.LOSV3!=Vector3.Zero)
+				
+				if (CurrentTarget.targetType.Value==TargetType.LineOfSight)
 				{
-					 //Recheck LOS every second
-					 if (CurrentTarget.LastLOSCheckMS>2500)
-					 {
-						  NavCellFlags LOSNavFlags=NavCellFlags.None;
-						  if (FunkyTrinity.Bot.Class.IsMeleeClass||!CurrentTarget.WithinInteractionRange())
-						  {
-								if (FunkyTrinity.Bot.Combat.powerPrime.IsRanged) //Add Projectile Testing!
-									 LOSNavFlags=NavCellFlags.AllowWalk|NavCellFlags.AllowProjectile;
-								else
-									 LOSNavFlags=NavCellFlags.AllowWalk;
-						  }
 
-						  if (CurrentTarget.LOSTest(FunkyTrinity.Bot.Character.Position, true, FunkyTrinity.Bot.Combat.powerPrime.IsRanged, LOSNavFlags))
-						  {
-								//Los Passed!
-								CurrentTarget.LOSV3=Vector3.Zero;
-								FunkyTrinity.Bot.Combat.bWholeNewTarget=true;
-								return false;
-						  }
+					 //Validate LOS movement
+					 if (CurrentTarget.LastLOSMoveResult.HasFlag(Zeta.Navigation.MoveResult.Failed|Zeta.Navigation.MoveResult.UnstuckAttempt|Zeta.Navigation.MoveResult.PathGenerationFailed|Zeta.Navigation.MoveResult.ReachedDestination))
+					 {
+						  if (Bot.SettingsFunky.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
+								Logger.Write(LogLevel.Movement, "LOS Ended Due to MoveResult {0} for Object {1}",CurrentTarget.LastLOSMoveResult.ToString(), CurrentTarget.InternalName);
+
+						  //CurrentTarget.LOSV3=Vector3.Zero;
+						  Bot.NavigationCache.LOSmovementUnit=null;
+						  FunkyTrinity.Bot.Combat.bWholeNewTarget=true;
+						  return false;
 					 }
 
-					 TargetMovement.CurrentTargetLocation=CurrentTarget.LOSV3;
-					 if (FunkyTrinity.Bot.Character.Position.Distance(CurrentTarget.LOSV3)>2.5f)
+					 if (CurrentTarget.LastLOSMoveResult.HasFlag(Zeta.Navigation.MoveResult.Moved))
 					 {
-						  CurrentState=TargetMovement.TargetMoveTo(CurrentTarget);
+						  //CurrentState=TargetMovement.TargetMoveTo(CurrentTarget);
+						  CurrentState=RunStatus.Running;
+						  CurrentTarget.LastLOSMoveResult=Zeta.Navigation.Navigator.MoveTo(CurrentTarget.LOSV3, "LOS Movement", true);
 						  return false;
 					 }
 				}
 
-
+				// Set current destination to our current target's destination
+				TargetMovement.CurrentTargetLocation=CurrentTarget.Position;
 
 				//Check if we are in range for interaction..
 				if (CurrentTarget.WithinInteractionRange())
@@ -522,7 +526,7 @@ namespace FunkyTrinity.Targeting
 		  {
 
 				#region DebugInfo
-				if (FunkyTrinity.Bot.SettingsFunky.DebugStatusBar)
+				if (FunkyTrinity.Bot.SettingsFunky.Debug.DebugStatusBar)
 				{
 					 Funky.sStatusText="[Interact- ";
 					 switch (CurrentTarget.targetType.Value)

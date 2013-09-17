@@ -20,8 +20,9 @@ namespace FunkyTrinity.ability.Abilities.DemonHunter
 
 			WaitVars = new WaitLoops(1, 1, true);
 			Cost = 30;
-			Range = 55;
+			Range = 50;
 			IsRanged = true;
+			IsProjectile=true;
 			UseageType=AbilityUseage.Combat;
 			Priority = AbilityPriority.Low;
 			PreCastConditions = (AbilityConditions.CheckPlayerIncapacitated | AbilityConditions.CheckEnergy);

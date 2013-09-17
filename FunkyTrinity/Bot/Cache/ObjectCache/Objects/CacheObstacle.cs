@@ -207,12 +207,13 @@ namespace FunkyTrinity.Cache
 				///Returns avoidance type if any was set
 				///</summary>
 				public AvoidanceType AvoidanceType { get; set; }
+				private AvoidanceValue AvoidanceValue=new AvoidanceValue();
 
 				public override float Radius
 				{
 					 get
 					 {
-						  float radius=Funky.dictAvoidanceRadius[AvoidanceType];
+						  float radius=(float)this.AvoidanceValue.Radius;
 
 						  //Modify radius during critical avoidance for arcane sentry.
 						  if (Bot.Combat.CriticalAvoidance&&AvoidanceType==AvoidanceType.ArcaneSentry)
@@ -243,7 +244,7 @@ namespace FunkyTrinity.Cache
 
 					 this.Position=newPosition;
 
-					 if (Bot.SettingsFunky.UseAdvancedProjectileTesting)
+					 if (Bot.SettingsFunky.Avoidance.UseAdvancedProjectileTesting)
 					 {
 						  //Do fancy checks for this fixed projectile.
 						  if (this.Ray.Intersects(Bot.Character.CharacterSphere).HasValue)
@@ -292,14 +293,6 @@ namespace FunkyTrinity.Cache
 					 }
 				}
 
-				public bool IsActiveAvoidance
-				{
-					 get
-					 {
-						  return ((Bot.SettingsFunky.AttemptAvoidanceMovements||Bot.Combat.CriticalAvoidance)
-									 &&Bot.AvoidancesHealth.ContainsKey(this.AvoidanceType)&&Bot.AvoidancesHealth[this.AvoidanceType]>0d);
-					 }
-				}
 				public override bool TestIntersection(CacheObject OBJ, Vector3 BotPosition)
 				{
 					 if (this.Obstacletype.Value==ObstacleType.MovingAvoidance)
@@ -317,7 +310,7 @@ namespace FunkyTrinity.Cache
 				}
 				public override bool PointInside(Vector3 V3)
 				{
-					 return base.Position.Distance2D(V3)<=this.Radius;
+					 return base.Position.Distance(V3)<=this.Radius;
 				}
 				public override bool TestIntersection(Vector3 V1, Vector3 V2, bool CollisonRadius=true)
 				{
@@ -342,16 +335,18 @@ namespace FunkyTrinity.Cache
 					 : base(parent)
 				{
 					 this.AvoidanceType=avoidancetype;
+					 this.AvoidanceValue=Bot.SettingsFunky.Avoidance.Avoidances[(int)avoidancetype];
 
 					 //Special avoidances that require additional loops before removal
 					 if ((AvoidanceType.TreeSpore|AvoidanceType.GrotesqueExplosion).HasFlag(this.AvoidanceType))
-						  this.RefreshRemovalCounter=30;
+						  this.RefreshRemovalCounter=45;
 				}
 
 				public CacheAvoidance(CacheObject parent, AvoidanceType type, Ray R, double speed)
 					 : base(parent)
 				{
 					 this.AvoidanceType=type;
+					 this.AvoidanceValue=Bot.SettingsFunky.Avoidance.Avoidances[(int)type];
 					 this.ray_=R;
 					 this.Speed=speed;
 					 this.projectile_startPosition=base.Position;

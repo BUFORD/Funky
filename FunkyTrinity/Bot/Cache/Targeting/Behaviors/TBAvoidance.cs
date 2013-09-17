@@ -14,7 +14,7 @@ namespace FunkyTrinity.Targeting.Behaviors
 		  {
 				get
 				{
-					 return (FunkyTrinity.Bot.Combat.RequiresAvoidance&&(!FunkyTrinity.Bot.Combat.bAnyTreasureGoblinsPresent||FunkyTrinity.Bot.SettingsFunky.GoblinPriority<2)
+					 return (FunkyTrinity.Bot.Combat.RequiresAvoidance&&(!FunkyTrinity.Bot.Combat.bAnyTreasureGoblinsPresent||FunkyTrinity.Bot.SettingsFunky.Targeting.GoblinPriority<2)
 							&&(DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.timeCancelledEmergencyMove).TotalMilliseconds>FunkyTrinity.Bot.Combat.iMillisecondsCancelledEmergencyMoveFor));
 				}
 		  }
@@ -22,15 +22,19 @@ namespace FunkyTrinity.Targeting.Behaviors
 		  {
 				base.Test=(ref CacheObject obj) =>
 				 {
-
+					  if (Bot.SettingsFunky.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
+					  {
+							string avoidances="";
+							Bot.Combat.TriggeringAvoidances.ForEach(a => avoidances = avoidances + a.AvoidanceType.ToString() + ", ");
+							Logger.Write(LogLevel.Movement, "Avoidances Triggering: {0}", avoidances);
+					  }
 					  //Reuse the last generated safe spot...
-					  if (DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.LastAvoidanceMovement).TotalMilliseconds>=
-							  FunkyTrinity.Bot.Combat.iSecondsEmergencyMoveFor)
+					  if (DateTime.Now.Subtract(FunkyTrinity.Bot.Combat.LastAvoidanceMovement).TotalMilliseconds<FunkyTrinity.Bot.Combat.iSecondsEmergencyMoveFor)
 					  {
 							Vector3 reuseV3=FunkyTrinity.Bot.NavigationCache.AttemptToReuseLastLocationFound();
 							if (reuseV3!=Vector3.Zero)
 							{
-								 obj=new CacheObject(reuseV3, TargetType.Avoidance, 20000f, "SafeAvoid", 2.5f, -1);
+								 obj=new CacheObject(reuseV3, TargetType.Avoidance, 20000f, "SafeReuseAvoid", 2.5f, -1);
 								 return true;
 							}
 					  }
@@ -46,7 +50,7 @@ namespace FunkyTrinity.Targeting.Behaviors
 							obj=new CacheObject(vAnySafePoint, TargetType.Avoidance, 20000f, "SafeAvoid", 2.5f, -1);
 
 							//Estimate time we will be reusing this movement vector3
-							FunkyTrinity.Bot.Combat.iSecondsEmergencyMoveFor=1+(int)(distance/25f);
+							FunkyTrinity.Bot.Combat.iSecondsEmergencyMoveFor=1+(int)(distance/5f);
 
 							//Avoidance takes priority over kiting..
 							FunkyTrinity.Bot.Combat.timeCancelledFleeMove=DateTime.Now;

@@ -100,7 +100,7 @@ namespace FunkyTrinity.Targeting.Behaviors
 
 
 						 //Check if our current path intersects avoidances. (When not in town, and not currently inside avoidance)
-						 if (!FunkyTrinity.Bot.Character.bIsInTown&&(FunkyTrinity.Bot.SettingsFunky.AttemptAvoidanceMovements||FunkyTrinity.Bot.Combat.CriticalAvoidance)
+						 if (!FunkyTrinity.Bot.Character.bIsInTown&&(FunkyTrinity.Bot.SettingsFunky.Avoidance.AttemptAvoidanceMovements||FunkyTrinity.Bot.Combat.CriticalAvoidance)
 								 &&Navigation.NP.CurrentPath.Count>0
 								 &&FunkyTrinity.Bot.Combat.TriggeringAvoidances.Count==0)
 						 {
@@ -141,7 +141,7 @@ namespace FunkyTrinity.Targeting.Behaviors
 			  // Store if we are ignoring all units this cycle or not
 			  bool bIgnoreAllUnits=!FunkyTrinity.Bot.Combat.bAnyChampionsPresent
 										  &&!FunkyTrinity.Bot.Combat.bAnyMobsInCloseRange
-										  &&((!FunkyTrinity.Bot.Combat.bAnyTreasureGoblinsPresent&&FunkyTrinity.Bot.SettingsFunky.GoblinPriority>=2)||FunkyTrinity.Bot.SettingsFunky.GoblinPriority<2)
+										  &&((!FunkyTrinity.Bot.Combat.bAnyTreasureGoblinsPresent&&FunkyTrinity.Bot.SettingsFunky.Targeting.GoblinPriority>=2)||FunkyTrinity.Bot.SettingsFunky.Targeting.GoblinPriority<2)
 										  &&FunkyTrinity.Bot.Character.dCurrentHealthPct>=0.85d;
 
 
@@ -158,7 +158,9 @@ namespace FunkyTrinity.Targeting.Behaviors
 					{
 						 // Force the character to stay where it is if there is nothing available that is out of avoidance stuff and we aren't already in avoidance stuff
 						 thisobj.Weight=0;
-						 if (!FunkyTrinity.Bot.Combat.RequiresAvoidance) FunkyTrinity.Bot.Combat.bStayPutDuringAvoidance=true;
+						 if (!FunkyTrinity.Bot.Combat.RequiresAvoidance) 
+							  FunkyTrinity.Bot.Combat.bStayPutDuringAvoidance=true;
+
 						 continue;
 					}
 
@@ -186,36 +188,54 @@ namespace FunkyTrinity.Targeting.Behaviors
 							  Bot.Target.CurrentUnitTarget=(CacheUnit)CurrentTarget;
 
 							  //Generate next Ability..
-							  Ability nextAbility=FunkyTrinity.Bot.Class.AbilitySelector();
+							  Ability nextAbility=FunkyTrinity.Bot.Class.AbilitySelector(Bot.Target.CurrentUnitTarget);
 
 							  //reset unit target
 							  Bot.Target.CurrentUnitTarget=null;
 
-							  //Check if we are already within interaction range.
 							  if (!thisobj.WithinInteractionRange())
 							  {
-									Vector3 destinationV3=nextAbility.DestinationVector;
-									//Check if the estimated destination will also be inside avoidance zone..
-									if (ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(destinationV3)
-										||ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(destinationV3))
+									if (nextAbility.IsRanged)
 									{
-										 //Only wait if the object is special and we are not avoiding..
-										 if (thisobj.ObjectIsSpecial)
+										 Vector3 destinationV3=nextAbility.DestinationVector;
+										 //Check if the estimated destination will also be inside avoidance zone..
+										 if (ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(destinationV3)
+											 ||ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(destinationV3))
 										 {
-											  if (!FunkyTrinity.Bot.Combat.RequiresAvoidance)
+											  //Only wait if the object is special and we are not avoiding..
+											  if (thisobj.ObjectIsSpecial)
 											  {
-													FunkyTrinity.Bot.Combat.bStayPutDuringAvoidance=true;
-													resetTarget=true;
+													if (!FunkyTrinity.Bot.Combat.RequiresAvoidance)
+													{
+														 FunkyTrinity.Bot.Combat.bStayPutDuringAvoidance=true;
+														 resetTarget=true;
+													}
+													else if (!nextAbility.IsRanged&&nextAbility.Range>0)
+													{
+														 //Non-Ranged Ability.. act like melee..
+														 //Try to find a spot
+														 ObjectCache.Objects.objectsIgnoredDueToAvoidance.Add(thisobj);
+													}
 											  }
-											  else if (!nextAbility.IsRanged&&nextAbility.Range>0)
-											  {
-													//Non-Ranged Ability.. act like melee..
-													//Try to find a spot
+											  else
+													resetTarget=true;
+										 }
+
+									}
+									else
+									{
+										 Vector3 TestPosition=thisobj.BotMeleeVector;
+										 if (ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(TestPosition))
+											  resetTarget=true;
+										 else if (ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(TestPosition)) //intersecting avoidances..
+										 {
+											  if (thisobj.ObjectIsSpecial)
+											  {//Only add this to the avoided list when its not currently inside avoidance area
 													ObjectCache.Objects.objectsIgnoredDueToAvoidance.Add(thisobj);
 											  }
+											  else
+													resetTarget=true;
 										 }
-										 else
-											  resetTarget=true;
 									}
 							  }
 						 }

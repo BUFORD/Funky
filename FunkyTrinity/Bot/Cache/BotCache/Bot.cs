@@ -9,6 +9,7 @@ using FunkyTrinity.Cache;
 using FunkyTrinity.Movement;
 using System.Threading;
 using FunkyTrinity.Targeting;
+using FunkyTrinity.Settings;
 
 namespace FunkyTrinity
 {
@@ -17,7 +18,7 @@ namespace FunkyTrinity
 
 		  public static partial class Bot
 		  {
-				public static Funky.Settings_Funky SettingsFunky=new Funky.Settings_Funky();
+				public static Settings_Funky SettingsFunky=new Settings_Funky();
 				public static Player Class { get; set; }
 				public static CharacterCache Character { get; set; }
 				public static CombatCache Combat { get; set; }
@@ -130,6 +131,8 @@ namespace FunkyTrinity
 				internal static Zeta.Internals.Actors.ActorClass ActorClass=Zeta.Internals.Actors.ActorClass.Invalid;
 				internal static string CurrentAccountName;
 				internal static string CurrentHeroName;
+				internal static int CurrentLevel;
+
 				///<summary>
 				///Updates Account Name, Current Hero Name and Class Variables
 				///</summary>
@@ -141,6 +144,7 @@ namespace FunkyTrinity
 						  ActorClass=Zeta.ZetaDia.Service.CurrentHero.Class;
 						  CurrentAccountName=Zeta.ZetaDia.Service.CurrentHero.BattleTagName;
 						  CurrentHeroName=Zeta.ZetaDia.Service.CurrentHero.Name;
+						  CurrentLevel=Zeta.ZetaDia.Service.CurrentHero.Level;
 					 } catch (Exception)
 					 {
 						  Logging.WriteDiagnostic("[Funky] Exception Attempting to Update Current Account Details.");
@@ -169,7 +173,7 @@ namespace FunkyTrinity
 					 if (!ProfileManager.CurrentProfile.KillMonsters) iCurrentMaxKillRadius/=3;
 					 
 					 // Always have a minimum kill radius, so we're never getting whacked without retaliating
-					 if (iCurrentMaxKillRadius<10||Bot.SettingsFunky.IgnoreCombatRange) iCurrentMaxKillRadius=10;
+					 if (iCurrentMaxKillRadius<10||Bot.SettingsFunky.Ranges.IgnoreCombatRange) iCurrentMaxKillRadius=10;
 
 					 //Non-Combat Behavior we set minimum kill radius
 					 if (IsInNonCombatBehavior) iCurrentMaxKillRadius=50;
@@ -179,15 +183,15 @@ namespace FunkyTrinity
 					 
 
 					 //Ignore Loot Range Setting
-					 if (Bot.SettingsFunky.IgnoreLootRange)  iCurrentMaxLootRadius=10;
+					 if (Bot.SettingsFunky.Ranges.IgnoreLootRange) iCurrentMaxLootRadius=10;
 				}
 
 				#region SettingsRangeValues
-				internal static int KiteDistance
+				internal static int FleeDistance
 				{
 					 get
 					 {
-						  int value=Bot.SettingsFunky.KiteDistance;
+						  int value=Bot.SettingsFunky.Fleeing.FleeMaxMonsterDistance;
 
 						  if (value==0&&Bot.Character.ShouldFlee)
 								value=8;
@@ -200,105 +204,90 @@ namespace FunkyTrinity
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.ContainerOpenRange;
+						  return Bot.SettingsFunky.Ranges.ContainerOpenRange;
 					 }
 				}
 				internal static int NonEliteRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.NonEliteCombatRange;
+						  return Bot.SettingsFunky.Ranges.NonEliteCombatRange;
 					 }
 				}
 				internal static int EliteRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.EliteCombatRange;
+						  return Bot.SettingsFunky.Ranges.EliteCombatRange;
 					 }
 				}
 				internal static int GlobeRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.GlobeRange;
+						  return Bot.SettingsFunky.Ranges.GlobeRange;
 					 }
 				}
 				internal static double ItemRange
 				{
 					 get
 					 {
-						  return Bot.iCurrentMaxLootRadius+SettingsFunky.ItemRange;
+						  return Bot.iCurrentMaxLootRadius+SettingsFunky.Ranges.ItemRange;
 					 }
 				}
 				internal static int GoldRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.GoldRange;
+						  return Bot.SettingsFunky.Ranges.GoldRange;
 					 }
 				}
 				internal static int DestructibleRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.DestructibleRange;
+						  return Bot.SettingsFunky.Ranges.DestructibleRange;
 					 }
 				}
 				internal static int TreasureGoblinRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.TreasureGoblinRange;
+						  return Bot.SettingsFunky.Ranges.TreasureGoblinRange;
 					 }
 				}
 				internal static int ShrineRange
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.ShrineRange;
+						  return Bot.SettingsFunky.Ranges.ShrineRange;
 					 }
 				}
 				internal static double EmergencyHealthPotionLimit
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.PotionHealthPercent;
+						  return Bot.SettingsFunky.Combat.PotionHealthPercent;
 					 }
 				}
 				internal static double EmergencyHealthGlobeLimit
 				{
 					 get
 					 {
-						  return Bot.SettingsFunky.GlobeHealthPercent;
+						  return Bot.SettingsFunky.Combat.GlobeHealthPercent;
 					 }
 				}
 				#endregion
 
 				#region Avoidances
-				///<summary>
-				///Returns a specific dictionary according to the bots character flags.
-				///</summary>
-				internal static Dictionary<AvoidanceType, double> AvoidancesHealth
-				{
-					 get
-					 {
-						  if (Combat.CriticalAvoidance||IsInNonCombatBehavior)
-								 return Funky.dictAvoidanceHealthOOCIDBehaviorDefaults;
-						  else
-								 return Funky.ReturnDictionaryUsingActorClass(Class.AC);
-					 }
-				}
 
 				internal static bool IgnoringAvoidanceType(AvoidanceType thisAvoidance)
 				{
-					 if (!Bot.SettingsFunky.AttemptAvoidanceMovements)
+					 if (!Bot.SettingsFunky.Avoidance.AttemptAvoidanceMovements)
 						  return true;
 
-					 double dThisHealthAvoid;
-					 if (!AvoidancesHealth.TryGetValue(thisAvoidance, out dThisHealthAvoid))
-						  return true;
-					 else if (dThisHealthAvoid==0d)
+					 double dThisHealthAvoid=Bot.SettingsFunky.Avoidance.Avoidances[(int)thisAvoidance].Health;
+					 if (dThisHealthAvoid==0d)
 						  return true;
 
 					 return false;
@@ -309,9 +298,7 @@ namespace FunkyTrinity
 				///</summary>
 				internal static bool IgnoreAvoidance(AvoidanceType thisAvoidance)
 				{
-					 double dThisHealthAvoid;
-					 if (!AvoidancesHealth.TryGetValue(thisAvoidance, out dThisHealthAvoid))
-						  return true;
+					 double dThisHealthAvoid=Bot.SettingsFunky.Avoidance.Avoidances[(int)thisAvoidance].Health;
 
 					 if (!Combat.CriticalAvoidance)
 					 {//Not Critical Avoidance, should we be in total ignorance because of a buff?
@@ -416,6 +403,7 @@ namespace FunkyTrinity
 					 NavigationCache=new Navigation();
 					 Stats=new BotStatistics();
 					 shuttingDownBot=false;
+					 Funky.LeveledUpEventFired=false;
 				}
 
 		  }

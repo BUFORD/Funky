@@ -12,18 +12,46 @@ namespace FunkyTrinity.ability.Abilities.DemonHunter
 		{
 		}
 
-
+		private bool IsFiring
+		{
+			 get
+			 {
+				  Bot.Character.UpdateAnimationState(false);
+				  return 
+						Bot.Character.CurrentSNOAnim.HasFlag(
+						  SNOAnim.Demonhunter_Female_1HXBow_RapidFire_01|
+						  SNOAnim.Demonhunter_Female_Bow_RapidFire_01|
+						  SNOAnim.Demonhunter_Female_DW_XBow_RapidFire_01|
+						  SNOAnim.Demonhunter_Female_XBow_RapidFire_01|
+						  SNOAnim.Demonhunter_Male_1HXBow_RapidFire_01|
+						  SNOAnim.Demonhunter_Male_Bow_RapidFire_01|
+						  SNOAnim.Demonhunter_Male_DW_XBow_RapidFire_01|
+						  SNOAnim.Demonhunter_Male_XBow_RapidFire_01);
+			 }
+		}
 
 		public override void Initialize()
 		{
-			ExecutionType = AbilityUseType.Target;
+			ExecutionType = AbilityUseType.Target|AbilityUseType.ClusterTargetNearest;
 			WaitVars = new WaitLoops(0, 1, true);
-			Cost = 20;
+			Cost=this.RuneIndex==3?10:20;
 			Range = 50;
 			IsRanged = true;
+			IsProjectile=true;
 			UseageType=AbilityUseage.Combat;
 			Priority = AbilityPriority.Low;
-			PreCastConditions = (AbilityConditions.CheckPlayerIncapacitated | AbilityConditions.CheckEnergy);
+			PreCastConditions = (AbilityConditions.CheckPlayerIncapacitated);
+
+			TargetUnitConditionFlags=new UnitTargetConditions(TargetProperties.IsSpecial, 45);
+			ClusterConditions=new ability.ClusterConditions(10d, 45f, 2, true);
+
+			Fcriteria=new Func<bool>(() =>
+			{
+				 bool isChanneling=(this.IsFiring||Bot.Class.AbilityLastUseMS(SNOPower.DemonHunter_RapidFire)<350);
+				 //If channeling, check if energy is greater then 10.. else only start when energy is at least -40-
+				 return (isChanneling&&Bot.Character.dCurrentEnergy>6)||(Bot.Character.dCurrentEnergy>40)
+							  &&(!Bot.Class.bWaitingForSpecial||Bot.Character.dCurrentEnergy>=Bot.Class.iWaitingReservedAmount);
+			});
 		}
 
 		public override void InitCriteria()
