@@ -11,6 +11,7 @@ namespace FunkyTrinity.Settings
 	 
          public class Settings_Funky
          {
+                 public DateTime? BotStopTime { get; set; }
 				 public SettingDemonBuddy Demonbuddy { get; set; }
 				 public SettingDebug Debug { get; set; }
 				 public SettingTargeting Targeting { get; set; }
@@ -223,6 +224,7 @@ namespace FunkyTrinity.Settings
 					  }
 
 					  Bot.SettingsFunky=Settings_Funky.DeserializeFromXML();
+                      Bot.SettingsFunky.DetermineBotStopTime();
 				 }
 				 public static void SerializeToXML(Settings_Funky settings)
 				 {
@@ -247,5 +249,21 @@ namespace FunkyTrinity.Settings
 				 {
 					  return DeserializeFromXML(Funky.FolderPaths.sFunkySettingsCurrentPath);
 				 }
+
+                 public void DetermineBotStopTime()
+                 {
+                     //modify this to whatever time you want bot to stop on a daily basis
+                     var fourAM = DateTime.Today.AddHours(3).AddMinutes(45);
+                     if (DateTime.Now < fourAM)
+                     {
+                         BotStopTime = fourAM;
+                     }
+                     else
+                     {
+                         BotStopTime = fourAM.AddDays(1);
+                     }
+
+                     Logging.Write(string.Format("BotStopTime: {0}", BotStopTime));
+                 }
          }
 }

@@ -639,12 +639,6 @@
     <Compile Include="CombatRoutine\CombatRoutine.cs" />
     <Compile Include="CombatRoutine\RoutineDebug.cs" />
     <Compile Include="Config\FunkySettingsExtensions.cs" />
-    <Compile Include="CombatRoutine\CombatRoutine.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="CombatRoutine\RoutineDebug.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Config\Settings\SettingAvoidance.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
