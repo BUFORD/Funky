@@ -479,9 +479,16 @@ namespace FunkyTrinity.XMLTags
 				}
 				else if (lastCoinage==Bot.Character.Coinage&&TagTimer.Elapsed.TotalSeconds>TimeoutValue)
 				{
-					 Logging.WriteDiagnostic("TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
-					 timeoutBreached=true;
-					 return RunStatus.Success;
+					 int coinage=ZetaDia.Me.Inventory.Coinage;
+					 if (coinage==lastCoinage)
+					 {
+						  Logging.WriteDiagnostic("TrinityExploreDungeon gold inactivity timer tripped ({0}), tag finished!", TimeoutValue);
+						  timeoutBreached=true;
+						  return RunStatus.Success;
+					 }
+					 lastCoinage=coinage;
+					 TagTimer.Restart();
+					 return RunStatus.Failure;
 				}
 
 				return RunStatus.Failure;
@@ -510,7 +517,7 @@ namespace FunkyTrinity.XMLTags
 						  new Sequence(
 								new Action(ret => Logging.WriteDiagnostic("Visited all nodes but objective not complete, forcing grid reset!")),
 								new Action(ret => timesForcedReset++),
-								//new Action(ret => Trinity.hashSkipAheadAreaCache.Clear()),
+								new Action(ret => Movement.SkipAheadCache.ClearCache()),
 								new Action(ret => MiniMapMarker.KnownMarkers.Clear()),
 								new Action(ret => ForceUpdateScenes()),
 								new Action(ret => GridSegmentation.Reset()),
@@ -908,7 +915,7 @@ namespace FunkyTrinity.XMLTags
 								new Action(ret => UpdateRoute())
 						  )
 					 ),
-					 new Decorator(ret => Funky.PlayerMover.iTotalAntiStuckAttempts>0&&myPos.Distance2D(CurrentNavTarget)<=50f&&!Movement.Navigation.CanRayCast(myPos, CurrentNavTarget),
+					 new Decorator(ret => Bot.NavigationCache.currentMovementState.HasFlag(MovementState.WalkingInPlace)&&myPos.Distance2D(CurrentNavTarget)<=50f&&!Movement.Navigation.CanRayCast(myPos, CurrentNavTarget),
 						  new Sequence(
 								new Action(ret => SetNodeVisited("Stuck moving to node point, marking done (in LoS and nearby!)")),
 								new Action(ret => UpdateRoute())
@@ -1140,7 +1147,7 @@ namespace FunkyTrinity.XMLTags
 				if (TimeoutValue==0)
 					 TimeoutValue=900;
 
-				//Trinity.hashSkipAheadAreaCache.Clear();
+				Movement.SkipAheadCache.ClearCache();
 				PriorityScenesInvestigated.Clear();
 				MiniMapMarker.KnownMarkers.Clear();
 				if (PriorityScenes==null)

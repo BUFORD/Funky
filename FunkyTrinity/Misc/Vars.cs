@@ -9,10 +9,11 @@ using Zeta;
 using System.Reflection;
 using Zeta.Navigation;
 using System.IO;
-using FunkyTrinity.Enums;
+
 using FunkyTrinity.Cache;
 using System.Diagnostics;
 using System.Windows;
+using FunkyTrinity.Cache.Enums;
 
 namespace FunkyTrinity
 {
@@ -25,7 +26,7 @@ namespace FunkyTrinity
 		  private static bool initFunkyButton=false;
 		  private static bool initTreeHooks=false;
 		  private static bool bMaintainStatTracking=false;
-
+		  private static int iDemonbuddyMonsterPowerLevel=0;
         // **********************************************************************************************
         // *****   A few special variables, mainly for Giles use, just at the top for easy access   *****
         // **********************************************************************************************

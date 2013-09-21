@@ -4,7 +4,7 @@ using System.IO;
 using System.Globalization;
 using Zeta.Common;
 using System.Xml.Serialization;
-using FunkyTrinity.Enums;
+
 
 namespace FunkyTrinity.Settings
 {
@@ -136,7 +136,7 @@ namespace FunkyTrinity.Settings
                  Class = new ClassSettings();
              }
 
-
+				 //TODO:: Create Abstract Base Class and Derieved Classes for each D3 Class.
              public class ClassSettings
              {
                  //barb
@@ -199,6 +199,7 @@ namespace FunkyTrinity.Settings
 
 							if (Bot.CurrentLevel<60)
 							{
+								 Funky.Log("Using Low Level Settings");
 								 bool disableBehaviors=true;
 								 Bot.SettingsFunky=new Settings_Funky
 								 {
@@ -212,10 +213,12 @@ namespace FunkyTrinity.Settings
 							{
 								 if (Bot.ActorClass==Zeta.Internals.Actors.ActorClass.Barbarian||Bot.ActorClass==Zeta.Internals.Actors.ActorClass.Monk)
 								 {
+									  Funky.Log("Using Melee Inferno Default Settings");
 									  Settings_Funky settings=Settings_Funky.DeserializeFromXML(Path.Combine(Funky.FolderPaths.SettingsDefaultPath, "InfernoMelee.xml"));
 								 }
 								 else
 								 {
+									  Funky.Log("Using Ranged Inferno Default Settings");
 									  Settings_Funky settings=Settings_Funky.DeserializeFromXML(Path.Combine(Funky.FolderPaths.SettingsDefaultPath, "InfernoRanged.xml"));
 								 }
 							}
@@ -253,14 +256,14 @@ namespace FunkyTrinity.Settings
                  public void DetermineBotStopTime()
                  {
                      //modify this to whatever time you want bot to stop on a daily basis
-                     var fourAM = DateTime.Today.AddHours(3).AddMinutes(45);
-                     if (DateTime.Now < fourAM)
+                     var stopTime = DateTime.Today.AddHours(3).AddMinutes(35);
+                     if (DateTime.Now < stopTime)
                      {
-                         BotStopTime = fourAM;
+                         BotStopTime = stopTime;
                      }
                      else
                      {
-                         BotStopTime = fourAM.AddDays(1);
+                         BotStopTime = stopTime.AddDays(1);
                      }
 
                      Logging.Write(string.Format("BotStopTime: {0}", BotStopTime));
