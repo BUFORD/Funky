@@ -29,7 +29,7 @@ namespace FunkyTrinity.Ability.Abilities.Barb
             PreCastPreCastFlags = (AbilityPreCastFlags.CheckEnergy | AbilityPreCastFlags.CheckPlayerIncapacitated | AbilityPreCastFlags.CheckExisitingBuff);
             FcriteriaCombat = new Func<bool>(() =>
             {
-                return true
+                return true;
             });
 		}
 
