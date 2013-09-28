@@ -25,7 +25,7 @@ namespace FunkyTrinity.Ability.Abilities.Barb
             IsBuff = true;
 			UseageType = AbilityUseage.Anywhere;
             Priority = AbilityPriority.Highest;
-            PreCastPreCastFlags = (AbilityPreCastFlags.CheckCanCast | AbilityPreCastFlags.CheckPlayerIncapacitated);
+			PreCastPreCastFlags = (AbilityPreCastFlags.CheckCanCast | AbilityPreCastFlags.CheckPlayerIncapacitated);
 		}
 
 		#region IAbility

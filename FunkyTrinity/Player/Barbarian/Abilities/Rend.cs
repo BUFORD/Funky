@@ -30,7 +30,7 @@ namespace FunkyTrinity.Ability.Abilities.Barb
             PreCastPreCastFlags = (AbilityPreCastFlags.CheckRecastTimer | AbilityPreCastFlags.CheckEnergy |
                                                      AbilityPreCastFlags.CheckCanCast | AbilityPreCastFlags.CheckPlayerIncapacitated);
             TargetUnitConditionFlags = new UnitTargetConditions(TargetProperties.None, 10);
-			Fcriteria = new Func<bool>(() =>
+            FcriteriaCombat = new Func<bool>(() =>
 			{
                 return true;
 			});

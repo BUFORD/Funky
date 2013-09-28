@@ -27,10 +27,10 @@ namespace FunkyTrinity.Ability.Abilities.Barb
 			UseageType = AbilityUseage.Anywhere;
 			Priority = AbilityPriority.High;
             PreCastPreCastFlags = (AbilityPreCastFlags.CheckEnergy | AbilityPreCastFlags.CheckPlayerIncapacitated | AbilityPreCastFlags.CheckExisitingBuff);
-			Fcriteria = new Func<bool>(() =>
-			{
-                return true;
-			});
+            FcriteriaCombat = new Func<bool>(() =>
+            {
+                return true
+            });
 		}
 
 		#region IAbility

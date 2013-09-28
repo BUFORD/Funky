@@ -15,7 +15,7 @@ using Zeta.Common;
 using Zeta.Internals.Actors;
 
 namespace FunkyTrinity.Cache
-	 {
+{
 		  ///<summary>
 		  ///Cache of current combat variables
 		  ///</summary>
@@ -162,7 +162,7 @@ namespace FunkyTrinity.Cache
 					 }
 				}
 
-				#region Kite & Avoid
+			  #region Kite & Avoid
 
 				///<summary>
 				///Tracks if kiting was used last loop.
@@ -199,7 +199,7 @@ namespace FunkyTrinity.Cache
 
 
 				// Variables used to actually hold powers the power-selector has picked to use, for buffing and main power use
-				internal SNOPower powerLastSnoPowerUsed { get; set; }
+			 // internal SNOPower powerLastSnoPowerUsed { get; set; }
 
 				//Loot Check
 				internal bool ShouldCheckItemLooted { get; set; }
