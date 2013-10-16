@@ -33,11 +33,10 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				TargetUnitConditionFlags=new UnitTargetConditions(TargetProperties.None, 10,
 					falseConditionalFlags: TargetProperties.Fast);
 				ClusterConditions=new ClusterConditions(5d, 7, 2, false);
-				FcriteriaCombat=new Func<bool>(() =>
-				{
-					 // Bot.Combat.iAnythingWithinRange[(int)RangeIntervals.Range_6]>=2||(Bot.Character.dCurrentHealthPct<=0.85&&Bot.Target.CurrentTarget.RadiusDistance<=5f)||
-					 return true;
-				});
+                FcriteriaCombat = new Func<bool>(() =>
+                {
+                    return true;
+                });
 		  }
 
 		  #region IAbility

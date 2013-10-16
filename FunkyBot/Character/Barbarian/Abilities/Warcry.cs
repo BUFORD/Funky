@@ -30,17 +30,12 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				Range=0;
 				IsBuff=true;
 				UseageType=AbilityUseage.Anywhere;
-				Priority=AbilityPriority.High;
+				Priority=AbilityPriority.Highest;
 				PreCastFlags=(AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated);
-				FcriteriaBuff=new Func<bool>(() => { return !Bot.Class.HasBuff(SNOPower.Barbarian_WarCry); });
-				FcriteriaCombat=new Func<bool>(() =>
-				{
-					 return (!Bot.Class.HasBuff(SNOPower.Barbarian_WarCry)
-								||
-								(Bot.Class.PassivePowers.Contains(SNOPower.Barbarian_Passive_InspiringPresence)&&
-								 DateTime.Now.Subtract(PowerCacheLookup.dictAbilityLastUse[SNOPower.Barbarian_WarCry]).TotalSeconds>59
-								 ||Bot.Character.dCurrentEnergyPct<0.10));
-				});
+                FcriteriaCombat = new Func<bool>(() =>
+                {
+                    return true;
+                });
 
 		  }
 

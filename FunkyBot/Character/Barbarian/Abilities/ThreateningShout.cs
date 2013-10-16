@@ -32,14 +32,7 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				PreCastFlags=(AbilityPreCastFlags.CheckRecastTimer|AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated);
 				FcriteriaCombat=new Func<bool>(() =>
 				{
-					 return (
-						 Bot.Combat.iElitesWithinRange[(int)RangeIntervals.Range_20]>1||
-						 (Bot.Targeting.CurrentTarget.IsBoss&&Bot.Targeting.CurrentTarget.RadiusDistance<=20)||
-						 (Bot.Combat.iAnythingWithinRange[(int)RangeIntervals.Range_20]>2&&!Bot.Combat.bAnyBossesInRange&&
-						  (Bot.Combat.iElitesWithinRange[(int)RangeIntervals.Range_50]==0||
-							Bot.Class.HotbarPowers.Contains(SNOPower.Barbarian_SeismicSlam)))||
-						 Bot.Character.dCurrentHealthPct<=0.75
-						 );
+                    return Bot.Combat.iAnythingWithinRange[(int)RangeIntervals.Range_20] > 2;
 				});
 		  }
 
