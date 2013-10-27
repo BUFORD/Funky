@@ -160,7 +160,10 @@ namespace FunkyBot.Cache
 							 {
 								  //Health wells..
 								  if (Bot.Character.dCurrentHealthPct>Bot.Settings.Combat.HealthWellHealthPercent)
-										IgnoreThis=true;
+								  {
+										this.BlacklistLoops=5;
+										return false;
+								  }
 							 }
 							 else
 							 {
@@ -203,7 +206,8 @@ namespace FunkyBot.Cache
 
 							 if (this.IsCorpseContainer&&Bot.Settings.Targeting.IgnoreCorpses)
 							 {
-								  this.BlacklistLoops=-1;
+								  this.NeedsRemoved=true;
+								  this.BlacklistFlag=BlacklistType.Permanent;
 								  return false;
 							 }
 
@@ -283,8 +287,8 @@ namespace FunkyBot.Cache
 						if (this.Weight>0)
 						{
 							// Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
-							if (this==Bot.Targeting.LastCachedTarget&&centreDistance<=25f)
-								this.Weight+=400;
+							if (this==Bot.Targeting.LastCachedTarget)
+								this.Weight+=600;
 							// Are we prioritizing close-range stuff atm? If so limit it at a value 3k lower than monster close-range priority
 							if (Bot.Character.bIsRooted)
 								this.Weight=18500d-(Math.Floor(centreDistance)*200);
@@ -364,7 +368,7 @@ namespace FunkyBot.Cache
 			{
 				// Force waiting AFTER power use for certain abilities
 				Bot.Targeting.bWaitingAfterPower=true;
-				Bot.Class.PowerPrime.WaitLoopsAfter=10;
+				Bot.Class.PowerPrime.WaitLoopsAfter=5;
 			}
 
 			// Interactables can have a long channeling time...
@@ -373,7 +377,7 @@ namespace FunkyBot.Cache
 				Bot.Character.WaitWhileAnimating(1500);
 			}
 
-			Bot.Character.WaitWhileAnimating(175, true);
+			Bot.Character.WaitWhileAnimating(75, true);
 
 			// If we've tried interacting too many times, blacklist this for a while
 			if (this.InteractionAttempts>5)

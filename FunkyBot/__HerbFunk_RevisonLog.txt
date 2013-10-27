@@ -1,4 +1,55 @@
 ﻿// herbfunk revisions
+v2.6.1.6
+
+Line Of Sight Behavior:
+-Is now disabled by default! (to enable -> Funky Settings Advanced tab)
+-Fixed validation of object (should no longer get stuck!)
+-Units that are allowed is now based on IsSpecial (I.E. Targeting -> Unit Exceptions)
+
+Settings:
+-Added setting for Low HP Unit Max Distance Allowed. (used with Unit Exception Low HP <=25%)
+
+Misc:
+-New Game Event now clears TrinityLoadOnce UsedProfile List.
+-Healthwells no longer ignored due to health.
+-Added fixed collision radius values for large objects. (should help with avoidance movement)
+-Funky Townportal now generates random movements!
+-Added Female Zombies to Spawner ID Lookup.
+-Bot now recongizes Major Health Potions.
+-Fixed town run sell behavior bug where no potions existed in backpack.
+-Item Looting should no longer be hit or miss.
+-Fixed Shrines being reused when they shouldn't be.
+-Reduced the time of interaction for Interactable Gizmos.
+-Monk Breath of Light updated for non-buff versions of the skill.
+
+
+v2.6.1.0
+
+Ability:
+-Line of sight checking for ranged abilities should no longer ignore "transforming" units.
+-Added IsChanneling Property (this will allow buffs to be used during target handling)
+
+Line of Sight Behavior:
+-Added Blacklist of previous objects.
+-Rare chests are now capable of being used as the target. (when Increase Range for Rare Chests is enabled)
+-Units capable of being selected is now limited to Rare/Elites/Uniques/Goblins
+
+Demon Hunter:
+-Modified Spike trap criteria.
+
+Misc:
+-Added Townrun Movement hook to reduce the lag trying to travel back to the townportal.
+-Fixed Stats (Keys are now counted, Death/Game counter are now accurate)
+-Item objects now use 2D to check distance.
+-Avoidance behavior no longer checks time in the conditional property.
+
+Code:
+-Added Death treehook (BotEvents -> Death.cs). This does not override the DB behavior but is used prior to the DB behavior.
+-Character CurrentHitPointsPct event added when Value Changes.
+-Character CurrentLevelID event added when Value Changes.
+
+
+
 v2.6.0.0
 
 ErrorClicker Plugin:

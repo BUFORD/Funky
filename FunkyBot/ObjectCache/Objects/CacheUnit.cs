@@ -427,9 +427,6 @@ namespace FunkyBot.Cache
 						  // Prevent long-range mobs beign ignored while they may be pounding on us
 						  if (dUseKillRadius<=30&&CacheIDLookup.hashActorSNORanged.Contains(this.SNOID)) dUseKillRadius=30;
 
-						  if (this.CentreDistance<=Bot.Settings.Ranges.NonEliteCombatRange) Bot.Combat.bAnyMobsInCloseRange=true;
-
-
 
 						  // Bosses get extra radius
 						  if (this.IsBoss)
@@ -502,7 +499,7 @@ namespace FunkyBot.Cache
 
 						  // Standard 50f range when preforming OOC behaviors!
 						  if (Bot.IsInNonCombatBehavior)
-								dUseKillRadius=Funky.Settings.OutofCombatMaxDistance;
+								dUseKillRadius=Bot.Settings.Plugin.OutofCombatMaxDistance;
 
 						  return dUseKillRadius;
 					 }
@@ -883,10 +880,10 @@ namespace FunkyBot.Cache
 								//unless its in front of us.. we wait 500ms mandatory.
 								if (lastLOSCheckMS<500&&centreDistance>1f)
 								{
-									 if (this.IsEliteRareUnique||this.IsTreasureGoblin)
-									 {
+									// if (this.IsEliteRareUnique||this.IsTreasureGoblin)
+                                    if (this.ObjectIsSpecial)
 										  Bot.Combat.LoSMovementObjects.Add(this);
-									 }
+									 
 										 
 									 return false;
 								}
@@ -907,7 +904,10 @@ namespace FunkyBot.Cache
 
 									 if (lastLOSCheckMS<ReCheckTime)
 									 {
-										  if (this.IsEliteRareUnique||this.IsTreasureGoblin) Bot.Combat.LoSMovementObjects.Add(this);
+										  //if (this.IsEliteRareUnique||this.IsTreasureGoblin) 
+                                         if(this.ObjectIsSpecial)
+                                              Bot.Combat.LoSMovementObjects.Add(this);
+
 										  return false;
 									 }
 								}
@@ -918,10 +918,10 @@ namespace FunkyBot.Cache
 									 //LOS Movement -- Check for special objects
 									 bool Valid=false;
 									 //LOS failed.. now we should decide if we want to find a spot for this target, or just ignore it.
-									 if (this.IsEliteRareUnique||this.IsTreasureGoblin)
-									 {
+									// if (this.IsEliteRareUnique||this.IsTreasureGoblin)
+                                     if (this.ObjectIsSpecial)
 										  Bot.Combat.LoSMovementObjects.Add(this);
-									 }
+									 
 
 									 //Valid?? Did we find a location we could move to for LOS?
 									 if (!Valid)
@@ -958,24 +958,6 @@ namespace FunkyBot.Cache
 								Bot.Combat.bAnyTreasureGoblinsPresent=true;
 
 
-
-						  // Units with very high priority (1900+) allow an extra 50% on the non-elite kill slider range
-						  if (!Bot.Combat.bAnyMobsInCloseRange&&!Bot.Combat.bAnyChampionsPresent&&!Bot.Combat.bAnyTreasureGoblinsPresent&&this.CentreDistance<=(Bot.Settings.Ranges.NonEliteCombatRange*1.5))
-						  {
-								int iExtraPriority;
-								// Enable extended kill radius for specific unit-types
-								if (CacheIDLookup.hashActorSNORanged.Contains(this.SNOID))
-								{
-									 Bot.Combat.bAnyMobsInCloseRange=true;
-								}
-								if (!Bot.Combat.bAnyMobsInCloseRange&&CacheIDLookup.dictActorSNOPriority.TryGetValue(this.SNOID, out iExtraPriority))
-								{
-									 if (iExtraPriority>=1900)
-									 {
-										  Bot.Combat.bAnyMobsInCloseRange=true;
-									 }
-								}
-						  }
 
 						  // Total up monsters at various ranges
 						  if (centreDistance<=50f)
@@ -1422,15 +1404,15 @@ namespace FunkyBot.Cache
 					 {
 						  if ((this.IsEliteRareUnique&&!Bot.Settings.Targeting.IgnoreAboveAverageMobs)||
 									 (this.PriorityCounter>0)||
-									 (this.IsBoss&&!Bot.Settings.Targeting.IgnoreAboveAverageMobs&&this.CurrentHealthPct<=0.99d)||
+									 (this.IsBoss&&!Bot.Settings.Targeting.IgnoreAboveAverageMobs&&this.CurrentHealthPct.HasValue&&this.CurrentHealthPct<=0.99d)||
 									 (((this.IsSucideBomber&&Bot.Settings.Targeting.UnitExceptionSucideBombers)||this.IsCorruptantGrowth)&&this.CentreDistance<45f)||
 									 (this.IsSpawnerUnit&&Bot.Settings.Targeting.UnitExceptionSpawnerUnits)||
 									 ((this.IsTreasureGoblin&&Bot.Settings.Targeting.GoblinPriority>1))||
-									 (this.Monstersize.Value==MonsterSize.Ranged&&Bot.Settings.Targeting.UnitExceptionRangedUnits
+									 (this.Monstersize.HasValue&&this.Monstersize.Value==MonsterSize.Ranged&&Bot.Settings.Targeting.UnitExceptionRangedUnits
 										  &&(!this.IsEliteRareUnique||!Bot.Settings.Targeting.IgnoreAboveAverageMobs))||
-									 ((Bot.Settings.Targeting.UnitExceptionLowHP&&((this.CurrentHealthPct<0.25&&this.UnitMaxHitPointAverageWeight>0)
-												&&(!this.IsEliteRareUnique||!Bot.Settings.Targeting.IgnoreAboveAverageMobs)
-												&&((!Bot.Class.IsMeleeClass&&this.CentreDistance<30f)||(Bot.Class.IsMeleeClass&&this.RadiusDistance<12f))))))
+                                     //Low HP (25% or Less) & Is Not Considered Weak
+									 ((Bot.Settings.Targeting.UnitExceptionLowHP&&this.CurrentHealthPct.HasValue&&((this.CurrentHealthPct<=0.25&&this.UnitMaxHitPointAverageWeight>0)
+												&&(!this.IsEliteRareUnique||!Bot.Settings.Targeting.IgnoreAboveAverageMobs)&&(this.RadiusDistance<=Bot.Settings.Targeting.UnitExceptionLowHPMaximumDistance)))))
 
 
 

@@ -37,16 +37,38 @@ namespace FunkyBot.Targeting
 		  internal TargetChangeHandler TargetChanged;
 		  internal void OnTargetChanged(TargetChangedArgs e)
 		  {
-				TargetChangeHandler handler=TargetChanged;
-
 				if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
 					 Logger.Write(LogLevel.Target, "Changed Object: {0}", MakeStringSingleLine(e.newObject.DebugString));
 
+				
+
 				this.LastChangeOfTarget=DateTime.Now;
+				if (Bot.Settings.EnableWaitAfterContainers&&CurrentTarget.targetType==TargetType.Container)
+				{
+					 //Herbfunks delay for container loot.
+					 this.lastHadContainerAsTarget=DateTime.Now;
+
+					 if (CurrentTarget.IsResplendantChest)
+						  this.lastHadRareChestAsTarget=DateTime.Now;
+				}
+
+				// We're sticking to the same target, so update the target's health cache to check for stucks
+				if (CurrentTarget.targetType==TargetType.Unit)
+				{
+					 CurrentUnitTarget=(CacheUnit)CurrentTarget;
+					 //Used to pause after no targets found.
+					 this.lastHadUnitInSights=DateTime.Now;
+
+					 // And record when we last saw any form of elite
+					 if (CurrentUnitTarget.IsBoss||CurrentUnitTarget.IsEliteRareUnique||CurrentUnitTarget.IsTreasureGoblin)
+						  this.lastHadEliteUnitInSights=DateTime.Now;
+				}
+
 				TargetMovement.NewTargetResetVars();
 				Bot.Targeting.bWholeNewTarget=true;
 				Bot.Targeting.bPickNewAbilities=true;
 
+				TargetChangeHandler handler=TargetChanged;
 				if (handler!=null)
 				{
 					 handler(this, e);
@@ -113,10 +135,15 @@ namespace FunkyBot.Targeting
 				//Check avoidance requirement still valid
 				if (Bot.Targeting.RequiresAvoidance)
 				{
-					 if (!this.AvoidanceLastTarget&&DateTime.Now.Subtract(TargetMovement.LastMovementAttempted).TotalMilliseconds<300&&!ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(TargetMovement.CurrentTargetLocation)) //We are moving..? 
+					 if (!this.AvoidanceLastTarget&&
+						  DateTime.Now.Subtract(TargetMovement.LastMovementAttempted).TotalMilliseconds<300&&//We are moving..? 
+						  !ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(TargetMovement.CurrentTargetLocation)&&
+						  !ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(Bot.Character.Position, TargetMovement.CurrentTargetLocation)) 
 					 {
 						  Bot.Targeting.RequiresAvoidance=false;
 					 }
+					 else if (this.AvoidanceLastTarget&&this.LastCachedTarget.CentreDistance<=2.5f)
+						  Bot.Targeting.RequiresAvoidance=false;
 					 else if (Bot.Combat.TriggeringAvoidances.Count==0)
 						  Bot.Targeting.RequiresAvoidance=false;
 				}
@@ -132,38 +159,19 @@ namespace FunkyBot.Targeting
 				// Still no target, let's end it all!
 				if (!RefreshTargetBehaviors())
 				{
-					 //clear all prioritzed objects.
+					 this.StartingLocation=Vector3.Zero;
 					 Bot.Combat.PrioritizedRAGUIDs.Clear();
 					 return;
 				}
 
-
-				if (Bot.Settings.EnableWaitAfterContainers&&Bot.Targeting.CurrentTarget.targetType==TargetType.Container)
+				//Store starting location
+				if (this.StartingLocation==Vector3.Zero)
 				{
-					 //Herbfunks delay for container loot.
-					this.lastHadContainerAsTarget=DateTime.Now;
-
-					 if (Bot.Targeting.CurrentTarget.IsResplendantChest)
-						  this.lastHadRareChestAsTarget=DateTime.Now;
+					 this.StartingLocation=Bot.Character.Position;
 				}
 
-				// We're sticking to the same target, so update the target's health cache to check for stucks
-				if (Bot.Targeting.CurrentTarget.targetType==TargetType.Unit)
-				{
-					 CacheUnit thisUnitObj=(CacheUnit)Bot.Targeting.CurrentTarget;
-					 //Used to pause after no targets found.
-					 this.lastHadUnitInSights=DateTime.Now;
 
-					 // And record when we last saw any form of elite
-					 if (Bot.Targeting.CurrentTarget.IsBoss||thisUnitObj.IsEliteRareUnique||Bot.Targeting.CurrentTarget.IsTreasureGoblin)
-						  this.lastHadEliteUnitInSights=DateTime.Now;
-				}
 
-				// Record the last time our target changed etc.
-				if (Bot.Targeting.CurrentTarget!=LastCachedTarget)
-				{
-					 this.LastChangeOfTarget=DateTime.Now;
-				}
 		  }
 
 		  ///<summary>
@@ -172,7 +180,7 @@ namespace FunkyBot.Targeting
 		  private void InitObjectRefresh()
 		  {
 				//Cache last target only if current target is not avoidance (Movement).
-				LastCachedTarget=this.CurrentTarget!=null?this.CurrentTarget.Clone():ObjectCache.FakeCacheObject;
+				LastCachedTarget=this.CurrentTarget!=null?this.CurrentTarget:ObjectCache.FakeCacheObject;
 
 				if (!this.Equals(null)&&this.CurrentTarget.targetType.HasValue&&this.CurrentTarget.targetType.Value.HasFlag(TargetType.AvoidanceMovements))
 				{
@@ -215,7 +223,7 @@ namespace FunkyBot.Targeting
 
 
 				//Check if we should trim our SNO cache..
-				if (DateTime.Now.Subtract(ObjectCache.cacheSnoCollection.lastTrimming).TotalMilliseconds>Funky.Settings.UnusedSNORemovalRate)
+				if (DateTime.Now.Subtract(ObjectCache.cacheSnoCollection.lastTrimming).TotalMilliseconds>Bot.Settings.Plugin.UnusedSNORemovalRate)
 					 ObjectCache.cacheSnoCollection.TrimOldUnusedEntries();
 
 
@@ -261,10 +269,6 @@ namespace FunkyBot.Targeting
 				{
 					 if (!LastLevelIDChangeWasTownRun)
 					 {//Do full clear..
-						  ObjectCache.Objects.Clear();
-						  ObjectCache.cacheSnoCollection.ClearDictionaryCacheEntries();
-						  RemovalCheck=false;
-
 						  //Reset Playermover Backtrack Positions
 						  BackTrackCache.cacheMovementGPRs.Clear();
 
@@ -274,7 +278,14 @@ namespace FunkyBot.Targeting
 						  Bot.NavigationCache.LOSBlacklistedRAGUIDs.Clear();
 					 }
 
-					 Logger.Write(LogLevel.Movement, "Updating Search Grid Provider.");
+					 //Clear the object cache!
+					 ObjectCache.Objects.Clear();
+					 ObjectCache.cacheSnoCollection.ClearDictionaryCacheEntries();
+					 RemovalCheck=false;
+
+					 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
+						  Logger.Write(LogLevel.Movement, "Updating Search Grid Provider.");
+
 					 Navigator.SearchGridProvider.Update();
 
 					 LastLevelIDChangeWasTownRun=false;

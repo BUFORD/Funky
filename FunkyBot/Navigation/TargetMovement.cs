@@ -95,7 +95,7 @@ namespace FunkyBot.Movement
 					 bool bForceNewMovement=false;
 
 					 //Herbfunk: Added this to prevent stucks attempting to move to a target blocked. (Case: 3 champs behind a wall, within range but could not engage due to being on the other side.)
-					 if (NonMovementCounter>Funky.Settings.MovementNonMovementCount)
+					 if (NonMovementCounter>Bot.Settings.Plugin.MovementNonMovementCount)
 					 {
 						  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
 								Logger.Write(LogLevel.Movement,"non movement counter reached {0}", NonMovementCounter);
@@ -118,13 +118,13 @@ namespace FunkyBot.Movement
 								Bot.Combat.timeCancelledFleeMove=DateTime.Now;
 
 								//Check if we can walk to this location from current location..
-								if (!Navigation.CanRayCast(Bot.Character.Position, CurrentTargetLocation, NavCellFlags.AllowWalk))
+								if (!Navigation.CanRayCast(Bot.Character.Position, CurrentTargetLocation, UseSearchGridProvider: true))
 								{
 									 obj.RequiresLOSCheck=true;
 									 obj.BlacklistLoops=50;
 
 									 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-										  Logger.Write(LogLevel.Movement, "Ignoring Item {0} -- due to AllowWalk RayCast Failure!", obj.InternalName);
+										  Logger.Write(LogLevel.Movement, "Ignoring Item {0} -- due to RayCast Failure!", obj.InternalName);
 
 									 Bot.Targeting.bForceTargetUpdate=true;
 									 return RunStatus.Running;
@@ -168,12 +168,7 @@ namespace FunkyBot.Movement
 						  if (DateTime.Now.Subtract(LastMovementDuringCombat).TotalMilliseconds>=250)
 						  {
 								LastMovementDuringCombat=DateTime.Now;
-								// We've been stuck at least 250 ms, let's go and pick new targets etc.
 								BlockedMovementCounter++;
-								//Bot.Combat.bForceCloseRangeTarget=true;
-								//Bot.Combat.lastForcedKeepCloseRange=DateTime.Now;
-
-
 
 								// Tell target finder to prioritize close-combat targets incase we were bodyblocked
 								#region TargetingPriortize
@@ -230,7 +225,11 @@ namespace FunkyBot.Movement
 														  }
 													 }
 												}
-												
+												else if (obj.targetType.Value==TargetType.Item)
+												{
+													 obj.BlacklistLoops=1;
+													 Bot.Targeting.bForceTargetUpdate=true;
+												}
 										  }
 										  else
 										  {
@@ -256,11 +255,7 @@ namespace FunkyBot.Movement
 								#endregion
 
 
-								if (obj.targetType.Value==TargetType.Item)
-								{
-									 obj.BlacklistLoops=1;
-									 Bot.Targeting.bForceTargetUpdate=true;
-								}
+
 
 								return RunStatus.Running;
 						  } // Been 250 milliseconds of non-movement?

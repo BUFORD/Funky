@@ -19,7 +19,9 @@ namespace FunkyBot
          {
 				internal static void buttonFunkySettingDB_Click(object sender, RoutedEventArgs e)
 				 {
-					  Bot.UpdateCurrentAccountDetails();
+					 //Update Account Details when bot is not running!
+					 if (!Zeta.CommonBot.BotMain.IsRunning)
+							Bot.UpdateCurrentAccountDetails();
 
 					  string settingsFolder=FolderPaths.sDemonBuddyPath+@"\Settings\FunkyBot\"+Bot.CurrentAccountName;
 					  if (!Directory.Exists(settingsFolder)) Directory.CreateDirectory(settingsFolder);
@@ -317,7 +319,7 @@ namespace FunkyBot
 					  {
 							try
 							{
-
+								
 							} catch
 							{
 
@@ -394,6 +396,10 @@ namespace FunkyBot
 				 {
 					  Bot.Settings.Debug.SkipAhead=!Bot.Settings.Debug.SkipAhead;
 				 }
+                 private void LineOfSightBehaviorChecked(object sender, EventArgs e)
+                 {
+                     Bot.Settings.Plugin.EnableLineOfSightBehavior = !Bot.Settings.Plugin.EnableLineOfSightBehavior;
+                 }
 
              protected override void OnClosed(EventArgs e)
              {

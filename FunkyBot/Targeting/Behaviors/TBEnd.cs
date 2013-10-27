@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
 using FunkyBot.Cache;
 using FunkyBot.Cache.Enums;
+using FunkyBot.Movement;
 using Zeta;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.Internals.Actors;
+using Zeta.Navigation;
 
 namespace FunkyBot.Targeting.Behaviors
 {
@@ -36,10 +39,10 @@ namespace FunkyBot.Targeting.Behaviors
 								obj=new CacheObject(Bot.Character.Position, TargetType.NoMovement, 20000, "ContainerLootDropsWait", 2f, -1);
 								return true;
 						  }
-
+						  
 						  // Finally, a special check for waiting for wrath of the berserker cooldown before engaging Azmodan
 						  if (Bot.Class.HotbarPowers.Contains(SNOPower.Barbarian_WrathOfTheBerserker)&&Bot.Settings.Class.bWaitForWrath&&!Bot.Class.Abilities[SNOPower.Barbarian_WrathOfTheBerserker].AbilityUseTimer()&&
-							  ZetaDia.CurrentWorldId==121214&&
+							  Bot.Character.iCurrentWorldID==121214&&
 							  (Vector3.Distance(Bot.Character.Position, new Vector3(711.25f, 716.25f, 80.13903f))<=40f||Vector3.Distance(Bot.Character.Position, new Vector3(546.8467f, 551.7733f, 1.576313f))<=40f))
 						  {
 								Logging.Write("[Funky] Waiting for Wrath Of The Berserker cooldown before continuing to Azmodan.");
@@ -64,6 +67,45 @@ namespace FunkyBot.Targeting.Behaviors
 								obj=new CacheObject(Bot.Character.Position, TargetType.NoMovement, 20000, "GilesWaitForVoodooo", 0f, -1);
 								InactivityDetector.Reset();
 								return true;
+						  }
+
+						  //Check if we engaged in combat.. if so lets see how far we are from our starting location.
+						  if (Bot.Targeting.LastCachedTarget!=ObjectCache.FakeCacheObject&& 
+								Bot.Character.Position.Distance(Bot.Targeting.StartingLocation)>20f&&
+								!Navigation.CanRayCast(Bot.Character.Position, Funky.PlayerMover.vLastMoveTo, UseSearchGridProvider: true))
+						  {
+								Logging.Write("Updating Navigator!");
+								Navigator.Clear();
+								Navigator.MoveTo(Funky.PlayerMover.vLastMoveTo, "original destination", true);
+						  }
+
+
+						  //Check if our current path intersects avoidances. (When not in town, and not currently inside avoidance)
+						  if (!Bot.Character.bIsInTown&&(Bot.Settings.Avoidance.AttemptAvoidanceMovements||Bot.Character.CriticalAvoidance)
+								  &&Navigation.NP.CurrentPath.Count>0
+								  &&Bot.Combat.TriggeringAvoidances.Count==0)
+						  {
+								Vector3 curpos=Bot.Character.Position;
+								IndexedList<Vector3> curpath=Navigation.NP.CurrentPath;
+
+								var CurrentNearbyPath=curpath.Where(v => curpos.Distance(v)<=40f);
+								if (CurrentNearbyPath!=null&&CurrentNearbyPath.Any())
+								{
+									 Vector3 lastV3=Vector3.Zero;
+									 foreach (var item in CurrentNearbyPath.OrderBy(v => curpath.IndexOf(v)))
+									 {
+										  if (lastV3==Vector3.Zero)
+												lastV3=curpos;
+
+										  if (ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(item, lastV3))
+										  {
+												obj=new CacheObject(curpos, TargetType.NoMovement, 20000, "AvoidanceIntersection", 2.5f, -1);
+												return true;
+										  }
+
+										  lastV3=item;
+									 }
+								}
 						  }
 					 }
 

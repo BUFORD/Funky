@@ -63,6 +63,9 @@ namespace FunkyBot
 				///</summary>
 				internal static void UpdateCurrentAccountDetails()
 				{
+					 //Clear Cache -- (DB reuses values, even if it is incorrect!)
+					 ZetaDia.Memory.ClearCache();
+
 
 					 try
 					 {
@@ -83,17 +86,29 @@ namespace FunkyBot
 				internal static bool RefreshGameID()
 				{
 					 GameId curgameID=currentGameID;
-					using (ZetaDia.Memory.AcquireFrame())
-					{
-						curgameID=ZetaDia.Service.CurrentGameId;
-					}
+					 using (ZetaDia.Memory.AcquireFrame())
+					 {
+						  curgameID=ZetaDia.Service.CurrentGameId;
+					 }
 
 					 if (!curgameID.Equals(currentGameID))
 					 {
-						  Bot.BotStatistics.GameStats.Update();
+						  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.OutOfCombat))
+						  {
+								Logger.Write(LogLevel.OutOfCombat, "New Game Started");
+						  }
+
 						  //Start new current game stats
+						  Bot.BotStatistics.GameStats.Update();
+						  Bot.BotStatistics.ItemStats.Update();
 						  Bot.BotStatistics.ItemStats.CurrentGame.Reset();
 						  Bot.BotStatistics.GameStats.CurrentGame.Reset();
+
+						  //Update Account Details
+						  Bot.UpdateCurrentAccountDetails();
+
+                          //Clear TrinityLoadOnce Used Profiles!
+                          FunkyBot.XMLTags.TrinityLoadOnce.UsedProfiles.Clear();
 
 						  currentGameID=curgameID;
 						  return true;

@@ -19,7 +19,7 @@ namespace FunkyBot
 		 private static bool WaitingForRevive=false;
 		 public static RunStatus DeathHandler(object ret)
 		 {
-
+			  //TODO:: Add Safety Exit-Game for Broken Equipped Items 
 			  if (Zeta.Internals.UIElements.ReviveAtLastCheckpointButton.IsVisible&&Zeta.Internals.UIElements.ReviveAtLastCheckpointButton.IsEnabled)
 			  {
 					Logging.Write("Clicking Revive Button!");
@@ -35,8 +35,8 @@ namespace FunkyBot
 				  {
 						WaitingForRevive=false;
 						Revived=false;
-						Bot.Character.OnHealthChanged-=OnHealthChanged;
-						Bot.BotStatistics.GameStats.TotalDeaths++;
+						Bot.BotStatistics.GameStats.CurrentGame.Deaths++;
+						Bot.BotStatistics.ProfileStats.CurrentProfile.DeathCount++;
 				  }
 				  else
 				  {
@@ -45,6 +45,7 @@ namespace FunkyBot
 				  }
 			  }
 
+			  Bot.Character.OnHealthChanged-=OnHealthChanged;
 			  return RunStatus.Success;
 		 }
 

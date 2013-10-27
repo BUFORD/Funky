@@ -396,6 +396,27 @@ namespace FunkyBot
 					 return false;
 				}
 
+				///<summary>
+				///Returns a power for Combat Buffing.
+				///</summary>
+				internal bool FindCombatBuffPower(out Ability BuffAbility)
+				{
+					 BuffAbility=null;
+					 foreach (var item in this.Abilities.Values.Where(A => A.IsBuff&&A.UseageType.HasFlag(AbilityUseage.Combat|AbilityUseage.Anywhere)))
+					 {
+						  if (item.CheckPreCastConditionMethod())
+						  {
+								if (item.CheckCombatConditionMethod())
+								{
+									 BuffAbility=item;
+									 Ability.SetupAbilityForUse(ref BuffAbility);
+									 return true;
+								}
+						  }
+					 }
+					 return false;
+				}
+
 
 				///<summary>
 				///Enumerates through the ActiveSkills and adds them to the HotbarAbilities collection.
@@ -627,10 +648,13 @@ namespace FunkyBot
 				///</summary>
 				public Ability LastUsedAbility { get; set; }
 
-				internal void AbilitySuccessfullyUsed(Ability ability)
+				internal void AbilitySuccessfullyUsed(Ability ability, bool reorderAbilities)
 				{
 					 this.LastUsedAbility=ability;
-					 this.SortedAbilities=this.Abilities.Values.OrderByDescending(a => a.Priority).ThenByDescending(a => a.LastUsedMilliseconds).ToList();
+
+					 //Only Sort When Non-Channeling!
+					 if (reorderAbilities)
+						  this.SortedAbilities=this.Abilities.Values.OrderByDescending(a => a.Priority).ThenByDescending(a => a.LastUsedMilliseconds).ToList();
 				}
 
 				internal Ability PowerPrime;
