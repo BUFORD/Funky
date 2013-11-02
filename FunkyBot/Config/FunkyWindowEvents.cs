@@ -38,6 +38,17 @@ namespace FunkyBot
 
 				internal static FunkyWindow funkyConfigWindow;
 
+                private void DefaultOpenSettingsFileClicked(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(FolderPaths.sFunkySettingsCurrentPath);
+                    }
+                    catch
+                    {
+
+                    }
+                }
 				private void DefaultMenuLevelingClicked(object sender, EventArgs e)
 				{
 					 System.Windows.MessageBoxResult confirm=System.Windows.MessageBox.Show(funkyConfigWindow, 
@@ -319,7 +330,9 @@ namespace FunkyBot
 					  {
 							try
 							{
-								
+                                LBDebug.Items.Add(String.Format("Last Avoidance: {0}",Bot.Targeting.LastAvoidanceMovement.ToString()));
+                                LBDebug.Items.Add(String.Format("Avoided Last Target=={0}",Bot.Targeting.AvoidanceLastTarget.ToString()));
+
 							} catch
 							{
 
@@ -374,10 +387,14 @@ namespace FunkyBot
              {
                  Bot.Settings.Class.bFuryDumpAlways = !Bot.Settings.Class.bFuryDumpAlways;
              }
-				 private void bMonkSpamMantraChecked(object sender, EventArgs e)
-				 {
-					  Bot.Settings.Class.bMonkSpamMantra=!Bot.Settings.Class.bMonkSpamMantra;
-				 }
+             private void bMonkMaintainSweepingWindChecked(object sender, EventArgs e)
+             {
+                 Bot.Settings.Class.bMonkMaintainSweepingWind = !Bot.Settings.Class.bMonkMaintainSweepingWind;
+             }
+             private void bMonkSpamMantraChecked(object sender, EventArgs e)
+             {
+                 Bot.Settings.Class.bMonkSpamMantra = !Bot.Settings.Class.bMonkSpamMantra;
+             }
              private void iDHVaultMovementDelaySliderChanged(object sender, EventArgs e)
              {
                  Slider slider_sender = (Slider)sender;
@@ -396,10 +413,7 @@ namespace FunkyBot
 				 {
 					  Bot.Settings.Debug.SkipAhead=!Bot.Settings.Debug.SkipAhead;
 				 }
-                 private void LineOfSightBehaviorChecked(object sender, EventArgs e)
-                 {
-                     Bot.Settings.Plugin.EnableLineOfSightBehavior = !Bot.Settings.Plugin.EnableLineOfSightBehavior;
-                 }
+
 
              protected override void OnClosed(EventArgs e)
              {

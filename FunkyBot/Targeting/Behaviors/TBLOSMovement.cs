@@ -32,7 +32,7 @@ namespace FunkyBot.Targeting.Behaviors
 				get
 				{
 					 //Check objects added for LOS movement
-					 return Bot.Settings.Plugin.EnableLineOfSightBehavior&&!Bot.IsInNonCombatBehavior&&(Bot.Combat.LoSMovementObjects.Count>0||Bot.NavigationCache.LOSmovementObject!=null);
+					 return Bot.Settings.LOSMovement.EnableLOSMovementBehavior&&!Bot.IsInNonCombatBehavior&&(Bot.Combat.LoSMovementObjects.Count>0||Bot.NavigationCache.LOSmovementObject!=null);
 				}
 		  }
 
@@ -94,7 +94,7 @@ namespace FunkyBot.Targeting.Behaviors
 								Navigation.NP.MoveTo(Bot.NavigationCache.LOSVector, "LineOfSightMoveTo", true);
 
 								//Setup a temp target that the handler will use
-								obj=new CacheObject(Bot.NavigationCache.LOSVector, TargetType.LineOfSight, 1d, "Line Of Sight", 5f, Bot.NavigationCache.LOSmovementObject.RAGUID);
+								obj=new CacheObject(Bot.NavigationCache.LOSVector, TargetType.LineOfSight, 1d, Bot.NavigationCache.LOSmovementObject.InternalName, 5f, Bot.NavigationCache.LOSmovementObject.RAGUID);
 								return true;
 						  }
 					 }

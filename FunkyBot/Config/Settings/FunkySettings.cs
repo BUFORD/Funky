@@ -53,12 +53,10 @@ namespace FunkyBot.Settings
 
 
 
-             public int AvoidanceRecheckMaximumRate { get; set; }//=1250;
-             public int AvoidanceRecheckMinimumRate { get; set; }//=500;
-             public int KitingRecheckMaximumRate { get; set; }//=4000;
-             public int KitingRecheckMinimumRate { get; set; }//=2000;
 
 				 public SettingCluster Cluster { get; set; }
+
+                 public SettingLOSMovement LOSMovement { get; set; }
 
 				 public SettingPlugin Plugin { get; set; }
 
@@ -78,12 +76,9 @@ namespace FunkyBot.Settings
 					  Targeting=new SettingTargeting();
 					  Combat=new SettingCombat();
 					  Avoidance=new SettingAvoidance();
+                      LOSMovement = new SettingLOSMovement();
 					  Plugin=new SettingPlugin();
 					 
-                 AvoidanceRecheckMaximumRate = 3500;
-                 AvoidanceRecheckMinimumRate = 550;
-                 KitingRecheckMaximumRate = 4500;
-                 KitingRecheckMinimumRate = 1000;
 
                  BuyPotionsDuringTownRun = false;
 					  EnableWaitAfterContainers=false;
@@ -104,35 +99,36 @@ namespace FunkyBot.Settings
                  public bool bGoblinWrath { get; set; }
                  public bool bFuryDumpWrath { get; set; }
                  public bool bFuryDumpAlways { get; set; }
-					  public bool bBarbUseWOTBAlways { get; set; }
+                 public bool bBarbUseWOTBAlways { get; set; }
                  //DH
                  public int iDHVaultMovementDelay { get; set; }
 
                  //Monk
                  public bool bMonkInnaSet { get; set; }
-					  public bool bMonkSpamMantra { get; set; }
-					  public bool bMonkComboStrike { get; set; }
-					  public int iMonkComboStrikeAbilities { get; set; }
+                 public bool bMonkSpamMantra { get; set; }
+                 public bool bMonkComboStrike { get; set; }
+                 public int iMonkComboStrikeAbilities { get; set; }
+                 public bool bMonkMaintainSweepingWind { get; set; }
 
                  //Wiz
                  public bool bWaitForArchon { get; set; }
                  public bool bKiteOnlyArchon { get; set; }
-					  public bool bCancelArchonRebuff { get; set; }
-					  public bool bTeleportIntoGrouping { get; set; }
-					  public bool bTeleportFleeWhenLowHP { get; set; }
+                 public bool bCancelArchonRebuff { get; set; }
+                 public bool bTeleportIntoGrouping { get; set; }
+                 public bool bTeleportFleeWhenLowHP { get; set; }
 
                  //WD+Wiz
-					  //public bool bEnableCriticalMass { get; set; }
+                 //public bool bEnableCriticalMass { get; set; }
 
                  //Range Class
                  public int GoblinMinimumRange { get; set; }
 
                  public ClassSettings()
                  {
-							bTeleportIntoGrouping=false;
-							bTeleportFleeWhenLowHP=true;
-							bCancelArchonRebuff=false;
-							bBarbUseWOTBAlways=false;
+                     bTeleportIntoGrouping = false;
+                     bTeleportFleeWhenLowHP = true;
+                     bCancelArchonRebuff = false;
+                     bBarbUseWOTBAlways = false;
                      bSelectiveWhirlwind = false;
                      bWaitForWrath = false;
                      bGoblinWrath = false;
@@ -140,9 +136,10 @@ namespace FunkyBot.Settings
                      bFuryDumpAlways = false;
                      iDHVaultMovementDelay = 400;
                      bMonkInnaSet = false;
-							bMonkSpamMantra=false;
-							bMonkComboStrike=false;
-							iMonkComboStrikeAbilities=0;
+                     bMonkSpamMantra = false;
+                     bMonkComboStrike = false;
+                     bMonkMaintainSweepingWind = false;
+                     iMonkComboStrikeAbilities = 0;
                      bWaitForArchon = false;
                      bKiteOnlyArchon = true;
                      GoblinMinimumRange = 40;

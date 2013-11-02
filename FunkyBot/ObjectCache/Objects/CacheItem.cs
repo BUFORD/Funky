@@ -178,19 +178,19 @@ namespace FunkyBot.Cache
 										  this.Weight=18000-(Math.Floor(centreDistance)*200);
 									 // If there's a monster in the path-line to the item, reduce the weight
 									 if (ObjectCache.Obstacles.Monsters.Any(cp => cp.PointInside(this.Position)))
-										  this.Weight*=0.25;
+										  this.Weight*=0.75;
 									 //Finally check if we should reduce the weight when more then 2 monsters are nearby..
-									 if (Bot.Combat.SurroundingUnits>2&&
-										  //But Only when we are low in health..
-											 (Bot.Character.dCurrentHealthPct<0.25||
-										  //Or we havn't changed targets after 2.5 secs
-											 DateTime.Now.Subtract(Bot.Targeting.LastChangeOfTarget).TotalSeconds>2.5))
-										  this.Weight*=0.10;
+                                     //if (Bot.Combat.SurroundingUnits>2&&
+                                     //     //But Only when we are low in health..
+                                     //        (Bot.Character.dCurrentHealthPct<0.25||
+                                     //     //Or we havn't changed targets after 2.5 secs
+                                     //        DateTime.Now.Subtract(Bot.Targeting.LastChangeOfTarget).TotalSeconds>2.5))
+                                     //     this.Weight*=0.10;
 
 									 //Test if there are nearby units that will trigger kite action..
 									 if (Bot.Character.ShouldFlee)
 									 {
-										  if (ObjectCache.Objects.OfType<CacheUnit>().Any(m=>m.ShouldBeKited&&m.IsPositionWithinRange(this.Position, Bot.Settings.Fleeing.FleeMaxMonsterDistance)))
+										  if (ObjectCache.Objects.OfType<CacheUnit>().Any(m=>m.ShouldFlee&&m.IsPositionWithinRange(this.Position, Bot.Settings.Fleeing.FleeMaxMonsterDistance)))
 												this.Weight=1;
 									 }
 
@@ -433,6 +433,7 @@ namespace FunkyBot.Cache
 
 								try
 								{
+									 int balanceid = this.BalanceID.Value;
 									 int tmp_Level=this.ref_DiaItem.CommonData.Level;
 									 ItemType tmp_ThisType=this.ref_DiaItem.CommonData.ItemType;
 									 ItemBaseType tmp_ThisDBItemType=this.ref_DiaItem.CommonData.ItemBaseType;
@@ -446,7 +447,7 @@ namespace FunkyBot.Cache
 										  tmp_bThisTwoHanded=this.ref_DiaItem.CommonData.IsTwoHand;
 									 }
 
-									 thisnewGamebalance=new CacheBalance(tmp_Level, tmp_ThisType, tmp_ThisDBItemType, tmp_bThisOneHanded, tmp_bThisTwoHanded, tmp_ThisFollowerType);
+									 thisnewGamebalance = new CacheBalance(balanceid,itemlevel: tmp_Level, itemtype: tmp_ThisType, itembasetype: tmp_ThisDBItemType, onehand: tmp_bThisOneHanded, twohand: tmp_bThisTwoHanded, followertype: tmp_ThisFollowerType);
 								} catch (NullReferenceException)
 								{
 									 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Execption))
@@ -494,33 +495,37 @@ namespace FunkyBot.Cache
 						  //Pickup?
 						  // Now see if we actually want it
 						  #region PickupValidation
-						  if (!this.ShouldPickup.HasValue)
-						  {
-								if (Bot.Settings.ItemRules.UseItemRules)
-								{
-									 Interpreter.InterpreterAction action=Bot.ItemRulesEval.checkPickUpItem(this, ItemEvaluationType.PickUp);
-									 switch (action)
-									 {
-										  case Interpreter.InterpreterAction.PICKUP:
-												this.ShouldPickup=true;
-												break;
-										  case Interpreter.InterpreterAction.IGNORE:
-												this.ShouldPickup=false;
-												break;
-									 }
-								}
+                          if (!this.ShouldPickup.HasValue)
+                          {
+                              //Log Dropped Items Here!!
+                              ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.DroppedItemLog(this);
 
-								if (!this.ShouldPickup.HasValue)
-								{
-									 //Use Giles Scoring or DB Weighting..
-									 this.ShouldPickup=
-											Bot.Settings.ItemRules.ItemRuleGilesScoring?Funky.GilesPickupItemValidation(this)
-										  :ItemManager.Current.EvaluateItem((ACDItem)this.ref_DiaItem.CommonData, Zeta.CommonBot.ItemEvaluationType.PickUp); ;
-								}
-						  }
-						  else
-								this.NeedsUpdate=false;
+                              if (Bot.Settings.ItemRules.UseItemRules)
+                              {
+                                  Interpreter.InterpreterAction action = Bot.ItemRulesEval.checkPickUpItem(this, ItemEvaluationType.PickUp);
+                                  switch (action)
+                                  {
+                                      case Interpreter.InterpreterAction.PICKUP:
+                                          this.ShouldPickup = true;
+                                          break;
+                                      case Interpreter.InterpreterAction.IGNORE:
+                                          this.ShouldPickup = false;
+                                          break;
+                                  }
+                              }
 
+                              if (!this.ShouldPickup.HasValue)
+                              {
+                                  //Use Giles Scoring or DB Weighting..
+                                  this.ShouldPickup =
+                                         Bot.Settings.ItemRules.ItemRuleGilesScoring ? Funky.GilesPickupItemValidation(this)
+                                       : ItemManager.Current.EvaluateItem((ACDItem)this.ref_DiaItem.CommonData, Zeta.CommonBot.ItemEvaluationType.PickUp); ;
+                              }
+                          }
+                          else
+                          {
+                              this.NeedsUpdate = false;
+                          }
 						  #endregion
 
 						  #endregion

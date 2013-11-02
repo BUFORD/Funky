@@ -7,6 +7,8 @@ namespace FunkyBot.Targeting.Behaviors
 {
 	 public class TBAvoidance : TargetBehavior
 	 {
+         private DateTime AvoidRetryDate = DateTime.Today;
+
 		  public TBAvoidance() : base() { }
 
 		  public override TargetBehavioralTypes TargetBehavioralTypeType { get { return TargetBehavioralTypes.Avoidance; } }
@@ -14,8 +16,10 @@ namespace FunkyBot.Targeting.Behaviors
 		  {
 				get
 				{
-					 return (Bot.Targeting.RequiresAvoidance&&(!Bot.Combat.bAnyTreasureGoblinsPresent||Bot.Settings.Targeting.GoblinPriority<2));
-							//&&(DateTime.Now.Subtract(Bot.Combat.timeCancelledEmergencyMove).TotalMilliseconds>Bot.Combat.iMillisecondsCancelledEmergencyMoveFor));
+					 return 
+                         (Bot.Targeting.RequiresAvoidance&&
+                          DateTime.Now.CompareTo(AvoidRetryDate)>0&&
+                         (!Bot.Combat.bAnyTreasureGoblinsPresent||Bot.Settings.Targeting.GoblinPriority<2));
 				}
 		  }
 		  public override void Initialize()
@@ -30,18 +34,21 @@ namespace FunkyBot.Targeting.Behaviors
 								Logger.Write(LogLevel.Movement, "Avoidances Triggering: {0}", avoidances);
 					  }
 					  //Reuse the last generated safe spot...
-					  if (DateTime.Now.Subtract(Bot.Targeting.LastAvoidanceMovement).TotalMilliseconds<Bot.Combat.iSecondsEmergencyMoveFor)
+					  if (DateTime.Now.Subtract(Bot.Targeting.LastAvoidanceMovement).TotalSeconds<Bot.Combat.iSecondsEmergencyMoveFor)
 					  {
 							Vector3 reuseV3=Bot.NavigationCache.AttemptToReuseLastLocationFound();
 							if (reuseV3!=Vector3.Zero)
 							{
-								 obj=new CacheObject(reuseV3, TargetType.Avoidance, 20000f, "SafeReuseAvoid", 2.5f, -1);
-								 return true;
+                                if (!ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(reuseV3))
+                                {
+                                    obj = new CacheObject(reuseV3, TargetType.Avoidance, 20000f, "SafeReuseAvoid", 2.5f, -1);
+                                    return true;
+                                }
 							}
 					  }
 
 					  Vector3 vAnySafePoint;
-					  if (Bot.NavigationCache.AttemptFindSafeSpot(out vAnySafePoint, Vector3.Zero, Bot.Character.ShouldFlee))
+					  if (Bot.NavigationCache.AttemptFindSafeSpot(out vAnySafePoint, Vector3.Zero, Bot.Settings.Plugin.AvoidanceFlags))
 					  {
 							float distance=vAnySafePoint.Distance(Bot.Character.Position);
 
@@ -52,14 +59,14 @@ namespace FunkyBot.Targeting.Behaviors
 
 							//Estimate time we will be reusing this movement vector3
 							Bot.Combat.iSecondsEmergencyMoveFor=1+(int)(distance/5f);
-
-							//Avoidance takes priority over kiting..
-							Bot.Combat.timeCancelledFleeMove=DateTime.Now;
-							Bot.Combat.iMillisecondsCancelledFleeMoveFor=((Bot.Combat.iSecondsEmergencyMoveFor+1)*1000);
 							return true;
 					  }
-					  Avoidances.AvoidanceCache.UpdateAvoidKiteRates();
+                      else
+                      {//Failed to find any location..
 
+                          //Set the future date we must wait for to retry..
+                          AvoidRetryDate = DateTime.Now.AddMilliseconds(Bot.Settings.Avoidance.FailureRetryMilliseconds);
+                      }
 
 					  return false;
 				 };

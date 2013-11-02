@@ -381,9 +381,18 @@ namespace FunkyBot.Targeting
 				}
 
 
+                //Make sure we are not incapacitated..
+              if (Bot.Character.bIsIncapacitated)
+              {
+                  CurrentState = RunStatus.Running;
+                  return false;
+              }
+
 				//We are ready for the specific object type interaction
 				return true;
 		  }
+
+         //TODO:: Add wait during Incapitated!
 
 		  public virtual bool CombatLogic()
 		  {
@@ -566,8 +575,6 @@ namespace FunkyBot.Targeting
 						  CurrentState=CurrentTarget.Interact();
 						  break;
 					 case TargetType.AvoidanceMovements:
-						  Bot.Combat.timeCancelledEmergencyMove=DateTime.Now;
-						  Bot.Combat.timeCancelledFleeMove=DateTime.Now;
 						  CurrentState=RunStatus.Running;
 						  break;
 					 case TargetType.NoMovement:

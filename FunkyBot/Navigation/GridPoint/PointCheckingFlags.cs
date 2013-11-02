@@ -22,6 +22,9 @@ namespace FunkyBot.Movement
         MonsterOverlap=4,
         AvoidanceIntersection=8,
         Raycast=16,
+        RaycastWalkable=32,
+        RaycastNavProvider=64,
+        BlockedDirection=128,
     }
 
 }

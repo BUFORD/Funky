@@ -49,8 +49,6 @@ namespace FunkyBot.Targeting.Behaviors
 									obj=new CacheObject(Bot.Character.Position, TargetType.Avoidance, 20000, "StayPutPoint", 2.5f, -1);
 									return true;
 							  }
-							  else
-									Bot.Combat.iMillisecondsCancelledEmergencyMoveFor=0; //reset wait time
 						 }
 
 
@@ -119,52 +117,19 @@ namespace FunkyBot.Targeting.Behaviors
 							  Bot.Targeting.CurrentUnitTarget=(CacheUnit)CurrentTarget;
 
 							 //Generate next Ability..
-							 Ability nextAbility=Bot.Class.AbilitySelector(Bot.Targeting.CurrentUnitTarget);
+							 Ability nextAbility=Bot.Class.AbilitySelector(Bot.Targeting.CurrentUnitTarget, true);
 
 
 							  if (nextAbility==Bot.Class.DefaultAttack&&!Bot.Class.CanUseDefaultAttack)
 							  {//No valid ability found
 
-									if (thisobj.ObjectIsSpecial)
-										 ObjectCache.Objects.objectsIgnoredDueToAvoidance.Add(thisobj);
-									else
+                                  Logger.Write(LogLevel.Target, "Could not find a valid ability for unit {0}", thisobj.InternalName);
+
+                                    //if (thisobj.ObjectIsSpecial)
+                                    //     ObjectCache.Objects.objectsIgnoredDueToAvoidance.Add(thisobj);
+                                    //else
 										 resetTarget=true;
 
-							  }
-							  else 
-							  {
-									float RadiusDistance=thisobj.RadiusDistance;
-									if (RadiusDistance>nextAbility.MinimumRange)
-									{//Ability found requires movement!
-
-										 //Try and find another ability we can use right now! (Exclude out of range ones)
-										  Ability LimitednextAbility=Bot.Class.AbilitySelector(Bot.Targeting.CurrentUnitTarget, true);
-										  if (LimitednextAbility==Bot.Class.DefaultAttack&&!Bot.Class.CanUseDefaultAttack)
-										  {//Found no valid ability!
-
-												//Our attempt at excluding out of range abilites failed..
-												//So we now test our orginal ability to see if it will cause avoidance triggers during movement.
-												Vector3 destinationV3=nextAbility.DestinationVector;
-												if (destinationV3!=Vector3.Zero)
-												{//We recieved a valid destination.. lets check it!
-
-													 if (ObjectCache.Obstacles.IsPositionWithinAvoidanceArea(destinationV3)) //Inside avoidance.
-														  resetTarget=true;
-													 else if (ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(destinationV3)) //intersecting avoidances..
-													 {//This destination intersects avoidances..
-
-														  if (thisobj.ObjectIsSpecial)
-														  {//Only add this to the avoided list when its not currently inside avoidance area
-																ObjectCache.Objects.objectsIgnoredDueToAvoidance.Add(thisobj);
-														  }
-														  else
-																resetTarget=true;
-													 }
-												}
-												else
-													 resetTarget=true;
-										  }
-									}
 							  }
 
 							  //reset unit target
@@ -183,12 +148,9 @@ namespace FunkyBot.Targeting.Behaviors
 							  if (!Bot.NavigationCache.BotIsNavigationallyBlocked)
 							  {
 									Vector3 SafeLOSMovement;
-									if (thisobj.GPRect.TryFindSafeSpot(Bot.Character.Position, out SafeLOSMovement, thisobj.Position, Bot.Character.ShouldFlee, true))
+									if (Bot.NavigationCache.AttemptFindSafeSpot(out SafeLOSMovement, thisobj.Position, Bot.Settings.Plugin.AvoidanceFlags))
 									{
 										 CurrentTarget=new CacheObject(SafeLOSMovement, TargetType.Avoidance, 20000, "SafetyMovement", 2.5f, -1);
-										 //Reset Avoidance Timer so we don't trigger it while moving towards the target!
-										 Bot.Combat.timeCancelledEmergencyMove=DateTime.Now;
-										 Bot.Combat.iMillisecondsCancelledEmergencyMoveFor=1000+((int)(Bot.Targeting.CurrentTarget.CentreDistance/25f)*1000);
 									}
 									else
 									{

@@ -150,17 +150,18 @@ namespace FunkyBot.AbilityFunky
 								{
 									 if (!LOSINFO.LOSTest(Bot.Character.Position, true, false, NavCellFlags.AllowProjectile))
 									 {
-										  bool MovementException=((Bot.Targeting.CurrentUnitTarget.MonsterTeleport||Bot.Targeting.CurrentTarget.IsTransformUnit)&&Bot.Targeting.CurrentUnitTarget.AnimState==Zeta.Internals.Actors.AnimationState.Transform);
+                                          
 
 										  //Raycast failed.. reset LOS Check -- for valid checking.
 										  if (!LOSINFO.RayCast.Value) 
 												Bot.Targeting.CurrentTarget.RequiresLOSCheck=true;
 										  else if (!LOSINFO.NavCellProjectile.Value) //NavCellFlag Walk Failed
 										  {
-												if (!Bot.Targeting.CurrentTarget.IsFlyingHoverUnit&&!MovementException)
-													 return false;
-												else
-													 LOSINFO.NavCellProjectile=true;
+                                              bool MovementException = ((Bot.Targeting.CurrentUnitTarget.MonsterTeleport || Bot.Targeting.CurrentTarget.IsTransformUnit) && Bot.Targeting.CurrentUnitTarget.AnimState == Zeta.Internals.Actors.AnimationState.Transform);
+                                              if (!MovementException)
+                                                  return false;
+                                                //else
+                                                     //LOSINFO.NavCellProjectile=true;
 										  }
 									 }
 								}
@@ -184,27 +185,26 @@ namespace FunkyBot.AbilityFunky
 								{
 									 //Verify LOS walk
 									 LOSInfo LOSINFO=Bot.Targeting.CurrentTarget.LineOfSight;
-									 if (LOSINFO.LastLOSCheckMS>2000||!LOSINFO.NavCellWalk.HasValue)
+									 if (LOSINFO.LastLOSCheckMS>2000)//||!LOSINFO.NavCellWalk.HasValue)
 									 {
-										  if (!LOSINFO.LOSTest(Bot.Character.Position, true, false, NavCellFlags.AllowWalk))
+										  if (!LOSINFO.LOSTest(Bot.Character.Position, true, false))
 										  {
-												bool MovementException=((Bot.Targeting.CurrentUnitTarget.MonsterTeleport||Bot.Targeting.CurrentTarget.IsTransformUnit)&&Bot.Targeting.CurrentUnitTarget.AnimState==Zeta.Internals.Actors.AnimationState.Transform);
+                                                //bool MovementException=((Bot.Targeting.CurrentUnitTarget.MonsterTeleport||Bot.Targeting.CurrentTarget.IsTransformUnit)&&Bot.Targeting.CurrentUnitTarget.AnimState==Zeta.Internals.Actors.AnimationState.Transform);
 												//Raycast failed.. reset LOS Check -- for valid checking.
 												if (!LOSINFO.RayCast.Value)
 													 Bot.Targeting.CurrentTarget.RequiresLOSCheck=true;
-												else if (!LOSINFO.NavCellWalk.Value) //NavCellFlag Walk Failed
-												{
-													 if (!Bot.Targeting.CurrentTarget.IsFlyingHoverUnit&&!MovementException)
-														  return false;
-													 else
-														  LOSINFO.NavCellWalk=true;
-												}
+                                                //else if (!LOSINFO.NavCellWalk.Value) //NavCellFlag Walk Failed
+                                                //{
+                                                //    bool MovementException = ((Bot.Targeting.CurrentUnitTarget.MonsterTeleport || Bot.Targeting.CurrentTarget.IsTransformUnit) && Bot.Targeting.CurrentUnitTarget.AnimState == Zeta.Internals.Actors.AnimationState.Transform);
+                                                //    if (!MovementException)
+                                                //        return false;
+                                                //}
 										  }
 									 }
-									 else if (LOSINFO.NavCellWalk.HasValue&&!LOSINFO.NavCellWalk.Value)
-									 {
-										  return false;
-									 }
+                                     //else if (LOSINFO.NavCellWalk.HasValue&&!LOSINFO.NavCellWalk.Value)
+                                     //{
+                                     //     return false;
+                                     //}
 								}
 						  }
 						  return true;
@@ -255,7 +255,7 @@ namespace FunkyBot.AbilityFunky
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.Unique))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.MonsterUnique; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.Ranged))
-						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.Monstersize.Value==MonsterSize.Ranged; });
+						 FSingleTargetUnitCriteria += new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.IsRanged; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.TargetableAndAttackable))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.IsTargetableAndAttackable; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.Fast))
@@ -266,6 +266,8 @@ namespace FunkyBot.AbilityFunky
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentTarget.RadiusDistance<10f; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.ReflectsDamage))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.MonsterReflectDamage; });
+                     if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.Electrified))
+                         FSingleTargetUnitCriteria += new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.MonsterElectrified; });
 				}
 
 				//FALSE CONDITIONS
@@ -300,17 +302,19 @@ namespace FunkyBot.AbilityFunky
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.Unique))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.MonsterUnique; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.Ranged))
-						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentUnitTarget.Monstersize.Value!=MonsterSize.Ranged; });
+						 FSingleTargetUnitCriteria += new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.IsRanged; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.TargetableAndAttackable))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.IsTargetableAndAttackable; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.Fast))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.IsFast; });
 					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.DOTDPS))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.HasDOTdps.HasValue||!Bot.Targeting.CurrentUnitTarget.HasDOTdps.Value; });
-					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.CloseDistance))
+                     if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.CloseDistance))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return Bot.Targeting.CurrentTarget.RadiusDistance>10f; });
-					 if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.TrueConditionFlags, TargetProperties.ReflectsDamage))
+                     if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.ReflectsDamage))
 						  FSingleTargetUnitCriteria+=new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.MonsterReflectDamage; });
+                     if (CheckTargetPropertyFlag(TargetUnitConditionFlags_.FalseConditionFlags, TargetProperties.Electrified))
+                         FSingleTargetUnitCriteria += new Func<bool>(() => { return !Bot.Targeting.CurrentUnitTarget.MonsterElectrified; });
 				}
 		  }
 
@@ -369,7 +373,7 @@ namespace FunkyBot.AbilityFunky
 					 properties|=TargetProperties.Weak;
 
 
-				if (unit.Monstersize.HasValue&&unit.Monstersize.Value==MonsterSize.Ranged)
+				if (unit.IsRanged)
 					 properties|=TargetProperties.Ranged;
 
 
@@ -385,6 +389,9 @@ namespace FunkyBot.AbilityFunky
 
 				if (unit.MonsterReflectDamage)
 					 properties|=TargetProperties.ReflectsDamage;
+
+                if (unit.MonsterElectrified)
+                    properties |= TargetProperties.Electrified;
 
 				return properties;
 		  }

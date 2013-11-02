@@ -114,8 +114,6 @@ namespace FunkyBot.Movement
 									 }
 								}
 
-								Bot.Combat.timeCancelledEmergencyMove=DateTime.Now;
-								Bot.Combat.timeCancelledFleeMove=DateTime.Now;
 
 								//Check if we can walk to this location from current location..
 								if (!Navigation.CanRayCast(Bot.Character.Position, CurrentTargetLocation, UseSearchGridProvider: true))
@@ -239,13 +237,8 @@ namespace FunkyBot.Movement
 														  Logger.Write(LogLevel.Movement, "Cannot continue with avoidance movement due to raycast failure!");
 													 BlockedMovementCounter=0;
 
-													 Bot.Combat.iMillisecondsCancelledEmergencyMoveFor/=2;
-													 Bot.Combat.timeCancelledEmergencyMove=DateTime.Now;
-													 //Ignore avoidance movements.
-													 Bot.Combat.iMillisecondsCancelledFleeMoveFor/=2;
-													 Bot.Combat.timeCancelledFleeMove=DateTime.Now;
-
 													 Bot.NavigationCache.CurrentGPArea.BlacklistLastSafespot();
+                                                     Bot.NavigationCache.vlastSafeSpot = Vector3.Zero;
 													 Bot.Targeting.bForceTargetUpdate=true;
 													 return RunStatus.Running;
 												}
@@ -359,8 +352,12 @@ namespace FunkyBot.Movement
 								//if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
 								//	 Logger.Write(LogLevel.Movement, "Last Line-Of-Sight Move Result=={0}", LastMovementResult.ToString());
 								if (Navigation.NP.CurrentPath.Count>0)
-									 ZetaDia.Me.UsePower(SNOPower.Walk, Navigation.NP.CurrentPath.Current, Bot.Character.iCurrentWorldID, -1);
-								
+								{
+									//Navigation.NP.CurrentPath.Current
+									ZetaDia.Me.Movement.MoveActor(Navigation.NP.CurrentPath.Current);
+									//ZetaDia.Me.UsePower(SNOPower.Walk, Navigation.NP.CurrentPath.Current, Bot.Character.iCurrentWorldID, -1);
+								}
+									
 						  }
 						  else
 						  {

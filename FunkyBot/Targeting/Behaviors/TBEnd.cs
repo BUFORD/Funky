@@ -69,44 +69,62 @@ namespace FunkyBot.Targeting.Behaviors
 								return true;
 						  }
 
-						  //Check if we engaged in combat.. if so lets see how far we are from our starting location.
-						  if (Bot.Targeting.LastCachedTarget!=ObjectCache.FakeCacheObject&& 
-								Bot.Character.Position.Distance(Bot.Targeting.StartingLocation)>20f&&
-								!Navigation.CanRayCast(Bot.Character.Position, Funky.PlayerMover.vLastMoveTo, UseSearchGridProvider: true))
+						  //Check if we engaged in combat..
+						  if (Bot.Targeting.LastCachedTarget != ObjectCache.FakeCacheObject)
 						  {
-								Logging.Write("Updating Navigator!");
-								Navigator.Clear();
-								Navigator.MoveTo(Funky.PlayerMover.vLastMoveTo, "original destination", true);
-						  }
+							  //Currently preforming an interactive profile behavior
+							  if (Bot.Profile.IsRunningOOCBehavior && Bot.Profile.ProfileBehaviorIsOOCInteractive && Bot.Profile.OOCBehaviorStartVector.Distance2D(Bot.Character.Position) > 10f)
+							  {
+								  if (Bot.Targeting.LastCachedTarget.Position != Bot.Profile.OOCBehaviorStartVector)
+									  Navigator.Clear();
 
+								  //Generate the path here so we can start moving..
+								  Navigation.NP.MoveTo(Bot.Profile.OOCBehaviorStartVector, "ReturnToOOCLoc", true);
+
+								  //Setup a temp target that the handler will use
+								  obj = new CacheObject(Bot.Profile.OOCBehaviorStartVector, TargetType.LineOfSight, 1d, "ReturnToOOCLoc", 10f);
+								  return true;
+							  }
+							  //lets see how far we are from our starting location.
+							  else if (Bot.Character.Position.Distance(Bot.Targeting.StartingLocation) > 20f &&
+									!Navigation.CanRayCast(Bot.Character.Position, Funky.PlayerMover.vLastMoveTo, UseSearchGridProvider: true))
+							  {
+								  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
+									  Logger.Write(LogLevel.Movement, "Updating Navigator in Target Refresh");
+
+								  SkipAheadCache.ClearCache();
+								  Navigator.Clear();
+								  Navigator.MoveTo(Funky.PlayerMover.vLastMoveTo, "original destination", true);
+							  }
+						  }
 
 						  //Check if our current path intersects avoidances. (When not in town, and not currently inside avoidance)
-						  if (!Bot.Character.bIsInTown&&(Bot.Settings.Avoidance.AttemptAvoidanceMovements||Bot.Character.CriticalAvoidance)
-								  &&Navigation.NP.CurrentPath.Count>0
-								  &&Bot.Combat.TriggeringAvoidances.Count==0)
-						  {
-								Vector3 curpos=Bot.Character.Position;
-								IndexedList<Vector3> curpath=Navigation.NP.CurrentPath;
+                          if (!Bot.Character.bIsInTown && (Bot.Settings.Avoidance.AttemptAvoidanceMovements || Bot.Character.CriticalAvoidance)
+                                  && Navigation.NP.CurrentPath.Count > 0
+                                  && Bot.Combat.TriggeringAvoidances.Count == 0)
+                          {
+                              //Vector3 curpos=Bot.Character.Position;
+                              //IndexedList<Vector3> curpath=Navigation.NP.CurrentPath;
 
-								var CurrentNearbyPath=curpath.Where(v => curpos.Distance(v)<=40f);
-								if (CurrentNearbyPath!=null&&CurrentNearbyPath.Any())
-								{
-									 Vector3 lastV3=Vector3.Zero;
-									 foreach (var item in CurrentNearbyPath.OrderBy(v => curpath.IndexOf(v)))
-									 {
-										  if (lastV3==Vector3.Zero)
-												lastV3=curpos;
+                              //var CurrentNearbyPath=curpath.Where(v => curpos.Distance(v)<=40f);
+                              //if (CurrentNearbyPath!=null&&CurrentNearbyPath.Any())
+                              //{
+                              //Vector3 lastV3=Vector3.Zero;
+                              //foreach (var item in CurrentNearbyPath.OrderBy(v => curpath.IndexOf(v)))
+                              //{
+                              //if (lastV3==Vector3.Zero)
+                              //lastV3=curpos;
 
-										  if (ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(item, lastV3))
-										  {
-												obj=new CacheObject(curpos, TargetType.NoMovement, 20000, "AvoidanceIntersection", 2.5f, -1);
-												return true;
-										  }
+                              if (ObjectCache.Obstacles.TestVectorAgainstAvoidanceZones(Bot.Character.Position, Navigation.NP.CurrentPath.Current))
+                              {
+                                  obj = new CacheObject(Bot.Character.Position, TargetType.NoMovement, 20000, "AvoidanceIntersection", 2.5f, -1);
+                                  return true;
+                              }
 
-										  lastV3=item;
-									 }
-								}
-						  }
+                              //lastV3=item;
+                              //}
+                              //}
+                          }
 					 }
 
 					 return obj!=null;
