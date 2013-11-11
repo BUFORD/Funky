@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using FunkyBot.Cache;
 using FunkyBot.Movement;
 using Zeta.Internals.SNO;
+using FunkyBot.Game;
 
 namespace FunkyBot.Cache
 {
@@ -119,7 +120,7 @@ namespace FunkyBot.Cache
 					 if (Bot.Character.Position.Distance(TestPosition)>=2f)
 					 {
 						  //If we are already ignored this recently.. lets just assume its still being ignored!
-						  if (DateTime.Now.Subtract(LastAvoidanceIgnored).TotalMilliseconds<1000&&Bot.Combat.NearbyAvoidances.Count>0)
+						  if (DateTime.Now.Subtract(LastAvoidanceIgnored).TotalMilliseconds<1000&&Bot.Targeting.Environment.NearbyAvoidances.Count>0)
 						  {
 								this.Weight=1;
 						  }
@@ -180,7 +181,7 @@ namespace FunkyBot.Cache
 									 if (ObjectCache.Obstacles.Monsters.Any(cp => cp.PointInside(this.Position)))
 										  this.Weight*=0.75;
 									 //Finally check if we should reduce the weight when more then 2 monsters are nearby..
-                                     //if (Bot.Combat.SurroundingUnits>2&&
+                                     //if (Bot.Targeting.Environment.SurroundingUnits>2&&
                                      //     //But Only when we are low in health..
                                      //        (Bot.Character.dCurrentHealthPct<0.25||
                                      //     //Or we havn't changed targets after 2.5 secs
@@ -329,7 +330,7 @@ namespace FunkyBot.Cache
 									 this.RequiresLOSCheck=false;
 								}
 
-								Bot.Combat.bAnyLootableItemsNearby=true;
+								Bot.Targeting.Environment.bAnyLootableItemsNearby=true;
 						  }
 						  else
 						  {
@@ -498,7 +499,7 @@ namespace FunkyBot.Cache
                           if (!this.ShouldPickup.HasValue)
                           {
                               //Log Dropped Items Here!!
-                              ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.DroppedItemLog(this);
+                              TotalStats.CurrentTrackingProfile.LootTracker.DroppedItemLog(this);
 
                               if (Bot.Settings.ItemRules.UseItemRules)
                               {
@@ -539,7 +540,7 @@ namespace FunkyBot.Cache
 								try
 								{
 									 this.GoldAmount=this.ref_DiaItem.CommonData.GetAttribute<int>(ActorAttributeType.Gold);
-								} catch (NullReferenceException)
+								} catch (Exception)
 								{
 									 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Execption))
 										  Logger.Write(LogLevel.Execption, "Failure to get gold amount for gold pile!"); 

@@ -19,7 +19,7 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				get { return SNOPower.Barbarian_WarCry; }
 		  }
 
-		  public override int RuneIndex { get { return Bot.Class.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.RuneIndexCache[this.Power]:-1; } }
+		  public override int RuneIndex { get { return Bot.Class.HotBar.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.HotBar.RuneIndexCache[this.Power]:-1; } }
 
 		  public override void Initialize()
 		  {
@@ -33,9 +33,9 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				Priority=AbilityPriority.Highest;
 				PreCastFlags=(AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated);
                 FcriteriaCombat = new Func<bool>(() =>
-                {
+				{
                     return true;
-                });
+				});
 
 		  }
 

@@ -5,9 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Zeta.Internals.Actors;
+using FunkyBot.Game;
 
-namespace FunkyBot.ProfileTracking
+namespace FunkyBot.Game
 {
+	public enum LootStatTypes
+	{
+		Looted,
+		Stashed,
+		Salvaged,
+		Vendored,
+		Dropped
+	}
     public class LootStats
     {
         public int Looted { get; set; }
@@ -35,8 +44,8 @@ namespace FunkyBot.ProfileTracking
         }
 
         public override string ToString()
-        {
-            return String.Format("Dropped {0} / Looted {1} / Stashed {2} / Vendored {3} / Salvaged {4}", 
+		{
+			return String.Format("{0} \t {1} \t {2} \t {3} \t {4}", 
                 this.Dropped, this.Looted, this.Stashed, this.Vendored, this.Salvaged);
         }
     }
@@ -69,6 +78,25 @@ namespace FunkyBot.ProfileTracking
             Keys.Merge(other.Keys);
         }
 
+		public int GetTotalLootStatCount(LootStatTypes statType)
+		{
+			switch (statType)
+			{
+				case LootStatTypes.Looted:
+					return this.Magical.Looted + this.Rare.Looted + this.Legendary.Looted + this.Crafting.Looted + this.Keys.Looted + this.Gems.Looted;
+				case LootStatTypes.Stashed:
+					return this.Magical.Stashed + this.Rare.Stashed + this.Legendary.Stashed + this.Crafting.Stashed + this.Keys.Stashed + this.Gems.Stashed;
+				case LootStatTypes.Salvaged:
+					return this.Magical.Salvaged + this.Rare.Salvaged + this.Legendary.Salvaged + this.Crafting.Salvaged + this.Keys.Salvaged + this.Gems.Salvaged;
+				case LootStatTypes.Vendored:
+					return this.Magical.Vendored + this.Rare.Vendored + this.Legendary.Vendored + this.Crafting.Vendored + this.Keys.Vendored + this.Gems.Vendored;
+				case LootStatTypes.Dropped:
+					return this.Magical.Dropped + this.Rare.Dropped + this.Legendary.Dropped + this.Crafting.Dropped + this.Keys.Dropped + this.Gems.Dropped;
+			}
+
+			return 0;
+		}
+
         public void LootedItemLog(GilesItemType thisgilesitemtype, GilesBaseItemType thisgilesbasetype, ItemQuality itemQuality)
         {
             if (thisgilesitemtype == GilesItemType.HealthPotion)
@@ -91,17 +119,17 @@ namespace FunkyBot.ProfileTracking
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[3]++;
                         //Statistics.ItemStats.CurrentGame.lootedItemTotals[3]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Looted++;
+						TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Looted++;
                     }
                     else if (itemQuality > ItemQuality.Magic3)
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[2]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Rare.Looted++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Rare.Looted++;
                     }
                     else
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[1]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Magical.Looted++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Magical.Looted++;
                     }
                     break;
 
@@ -110,12 +138,12 @@ namespace FunkyBot.ProfileTracking
                     if (thisgilesitemtype == GilesItemType.CraftingMaterial || thisgilesitemtype == GilesItemType.CraftingPlan || thisgilesitemtype == GilesItemType.CraftTome)
                     {
                         //   Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[(int)LootIndex.Crafting]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Looted++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Looted++;
                     }
                     else if (thisgilesitemtype == GilesItemType.InfernalKey)
                     {
                         // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[(int)LootIndex.Key]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Keys.Looted++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Keys.Looted++;
                     }
                     else
                     {
@@ -124,7 +152,7 @@ namespace FunkyBot.ProfileTracking
                     break;
                 case GilesBaseItemType.Gem:
                     // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.lootedItemTotals[(int)LootIndex.Gem]++;
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Gems.Looted++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Gems.Looted++;
                     break;
             }
 
@@ -139,7 +167,7 @@ namespace FunkyBot.ProfileTracking
             GilesItemType thisGilesItemType = Funky.DetermineItemType(i.ThisInternalName, i.ThisDBItemType, i.ThisFollowerType);
             if (thisGilesItemType == GilesItemType.InfernalKey)
             {
-                ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Keys.Stashed++;
+                TotalStats.CurrentTrackingProfile.LootTracker.Keys.Stashed++;
                 //	 Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Key]++;
                 return;
             }
@@ -150,11 +178,11 @@ namespace FunkyBot.ProfileTracking
                 case ItemType.CraftingPage:
                 case ItemType.CraftingPlan:
                 case ItemType.CraftingReagent:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Stashed++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Stashed++;
                     //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Crafting]++;
                     break;
                 case ItemType.Gem:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Gems.Stashed++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Gems.Stashed++;
                     // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Gem]++;
                     break;
                 case ItemType.Amulet:
@@ -195,17 +223,17 @@ namespace FunkyBot.ProfileTracking
                     if (i.ThisQuality == ItemQuality.Legendary)
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[3]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Stashed++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Stashed++;
                     }
                     else if (i.ThisQuality > ItemQuality.Magic3)
                     {
                         // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[2]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Rare.Stashed++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Rare.Stashed++;
                     }
                     else
                     {
                         //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[1]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Magical.Stashed++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Magical.Stashed++;
                     }
                     break;
             }
@@ -216,17 +244,17 @@ namespace FunkyBot.ProfileTracking
             if (i.ThisQuality == ItemQuality.Legendary)
             {
                 //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[3]++;
-                ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Salvaged++;
+                TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Salvaged++;
             }
             else if (i.ThisQuality > ItemQuality.Magic3)
             {
                 // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[2]++;
-                ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Rare.Salvaged++;
+                TotalStats.CurrentTrackingProfile.LootTracker.Rare.Salvaged++;
             }
             else
             {
                 //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[1]++;
-                ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Magical.Salvaged++;
+                TotalStats.CurrentTrackingProfile.LootTracker.Magical.Salvaged++;
             }
             return;
         }
@@ -241,11 +269,11 @@ namespace FunkyBot.ProfileTracking
                 case ItemType.CraftingPage:
                 case ItemType.CraftingPlan:
                 case ItemType.CraftingReagent:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Vendored++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Vendored++;
                     //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Crafting]++;
                     break;
                 case ItemType.Gem:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Gems.Vendored++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Gems.Vendored++;
                     // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Gem]++;
                     break;
                 case ItemType.Amulet:
@@ -286,17 +314,17 @@ namespace FunkyBot.ProfileTracking
                     if (i.ThisQuality == ItemQuality.Legendary)
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[3]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Vendored++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Vendored++;
                     }
                     else if (i.ThisQuality > ItemQuality.Magic3)
                     {
                         // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[2]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Rare.Vendored++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Rare.Vendored++;
                     }
                     else
                     {
                         //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[1]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Magical.Vendored++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Magical.Vendored++;
                     }
                     break;
             }
@@ -308,7 +336,7 @@ namespace FunkyBot.ProfileTracking
             GilesItemType thisGilesItemType = Funky.DetermineItemType(i.InternalName, thisBalanceData.thisItemType, thisBalanceData.thisFollowerType);
             if (thisGilesItemType == GilesItemType.InfernalKey)
             {
-                ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Keys.Dropped++;
+                TotalStats.CurrentTrackingProfile.LootTracker.Keys.Dropped++;
                 //	 Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Key]++;
                 return;
             }
@@ -318,11 +346,11 @@ namespace FunkyBot.ProfileTracking
                 case ItemType.CraftingPage:
                 case ItemType.CraftingPlan:
                 case ItemType.CraftingReagent:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Dropped++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Crafting.Dropped++;
                     //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Crafting]++;
                     break;
                 case ItemType.Gem:
-                    ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Gems.Dropped++;
+                    TotalStats.CurrentTrackingProfile.LootTracker.Gems.Dropped++;
                     // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[(int)LootIndex.Gem]++;
                     break;
                 case ItemType.Amulet:
@@ -363,17 +391,17 @@ namespace FunkyBot.ProfileTracking
                     if (i.Itemquality.Value == ItemQuality.Legendary)
                     {
                         //Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[3]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Dropped++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Legendary.Dropped++;
                     }
                     else if (i.Itemquality.Value > ItemQuality.Magic3)
                     {
                         // Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[2]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Rare.Dropped++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Rare.Dropped++;
                     }
                     else
                     {
                         //  Bot.BotStatistics.ProfileStats.CurrentProfile.ItemStats.stashedItemTotals[1]++;
-                        ProfileTracking.TotalStats.CurrentTrackingProfile.LootTracker.Magical.Dropped++;
+                        TotalStats.CurrentTrackingProfile.LootTracker.Magical.Dropped++;
                     }
                     break;
             }
@@ -381,7 +409,8 @@ namespace FunkyBot.ProfileTracking
 
         public override string ToString()
         {
-            return String.Format("Magical:    \t {0} \r\n" +
+			return String.Format("Type       \t Drop \t Loot \t Stash \t Sold \t Salvaged\r\n" +
+								 "Magical:    \t {0} \r\n" +
                                  "Rare:      \t {1} \r\n" +
                                  "Legendary: \t {2} \r\n" +
                                  "Gems:      \t {3} \r\n" +

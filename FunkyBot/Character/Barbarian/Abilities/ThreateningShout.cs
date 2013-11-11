@@ -19,7 +19,7 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				get { return SNOPower.Barbarian_ThreateningShout; }
 		  }
 
-		  public override int RuneIndex { get { return Bot.Class.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.RuneIndexCache[this.Power]:-1; } }
+		  public override int RuneIndex { get { return Bot.Class.HotBar.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.HotBar.RuneIndexCache[this.Power]:-1; } }
 
 		  public override void Initialize()
 		  {
@@ -32,7 +32,7 @@ namespace FunkyBot.AbilityFunky.Abilities.Barb
 				PreCastFlags=(AbilityPreCastFlags.CheckRecastTimer|AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated);
 				FcriteriaCombat=new Func<bool>(() =>
 				{
-                    return Bot.Combat.iAnythingWithinRange[(int)RangeIntervals.Range_20] > 2;
+                    return Bot.Targeting.Environment.iAnythingWithinRange[(int)RangeIntervals.Range_20] > 2;
 				});
 		  }
 

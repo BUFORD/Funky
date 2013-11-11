@@ -15,6 +15,7 @@ using Zeta.Internals.SNO;
 using Zeta.Navigation;
 using Zeta.TreeSharp;
 using FunkyBot.Cache.Enums;
+using FunkyBot.Game;
 
 
 namespace FunkyBot
@@ -200,7 +201,7 @@ namespace FunkyBot
 						  if (ZetaDia.Me.IsInTown)
 						  {
 
-                              ProfileTracking.TrackedProfile FirstProfile = ProfileTracking.TotalStats.ProfilesTracked.First();
+                              TrackedProfile FirstProfile = TotalStats.ProfilesTracked.First();
                               string profile = FirstProfile.ProfileName;
 
 								if (!string.IsNullOrEmpty(profile))
@@ -223,7 +224,7 @@ namespace FunkyBot
 									 Thread.Sleep(1000);
 									 ZetaDia.Service.Party.LeaveGame();
 									 //ZetaDia.Service.Games.LeaveGame();
-									 Funky.ResetGame();
+									 Funky.FunkyOnLeaveGame(null, null);
 									 // Wait for 10 second log out timer if not in town, else wait for 3 seconds instead
 									 Thread.Sleep(!ZetaDia.Me.IsInTown?10000:3000);
 								}
@@ -244,7 +245,7 @@ namespace FunkyBot
 					 if (Bot.Settings.Debug.RestartGameOnLongStucks&&DateTime.Now.Subtract(timeLastRestartedGame).TotalMinutes>=15)
 					 {
 						  timeLastRestartedGame=DateTime.Now;
-                          ProfileTracking.TrackedProfile FirstProfile = ProfileTracking.TotalStats.ProfilesTracked.First();
+                          TrackedProfile FirstProfile = TotalStats.ProfilesTracked.First();
                           string sUseProfile = FirstProfile.ProfileName;
 						  Logging.Write("[Funky] Anti-stuck measures exiting current game.");
 						  // Load the first profile seen last run
@@ -252,8 +253,8 @@ namespace FunkyBot
 														  ?sUseProfile
 														  :Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile);
 						  Thread.Sleep(1000);
-						  Funky.ResetGame();
 						  ZetaDia.Service.Party.LeaveGame();
+						  Funky.FunkyOnLeaveGame(null, null);
 						  // Wait for 10 second log out timer if not in town
 						  if (!ZetaDia.Me.IsInTown)
 						  {

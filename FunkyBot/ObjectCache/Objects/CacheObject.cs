@@ -457,7 +457,7 @@ namespace FunkyBot.Cache
 							if (Bot.IsInNonCombatBehavior)
 							{
 								 TargetType typesValid=TargetType.Unit|TargetType.Item|TargetType.Gold|TargetType.Globe;
-								 if (Bot.Profile.ProfileBehaviorIsOOCInteractive&&!Bot.Character.bIsInTown)
+								 if (Bot.Game.Profile.ProfileBehaviorIsOOCInteractive && !Bot.Character.bIsInTown)
 								 {
 									  typesValid|=TargetType.Door|TargetType.Barricade;
 								 }
@@ -492,11 +492,11 @@ namespace FunkyBot.Cache
 				public virtual void UpdateWeight()
 				{
 					 //Prioritized (Blocked/Intersecting Objects)
-					 if (Bot.Combat.PrioritizedRAGUIDs.Contains(this.RAGUID))
+					 if (Bot.NavigationCache.PrioritizedRAGUIDs.Contains(this.RAGUID))
 					 {
 						  this.PriorityCounter=this.PriorityCounter+1;
 						  this.PrioritizedDate=DateTime.Now;
-							Bot.Combat.PrioritizedRAGUIDs.Remove(this.RAGUID);
+						  Bot.NavigationCache.PrioritizedRAGUIDs.Remove(this.RAGUID);
 					 }
 
 					 // Just to make sure each one starts at 0 weight...

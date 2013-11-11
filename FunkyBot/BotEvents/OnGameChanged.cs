@@ -16,9 +16,12 @@ namespace FunkyBot
     {
 		  private static void FunkyOnGameChanged(object sender, EventArgs e)
 		  {
-				Navigator.SearchGridProvider.Update();
-				ResetGame();
-				Bot.RefreshGameID();
+			  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Event))
+				  Logger.Write(LogLevel.Event, "OnGameChanged Event");
+
+			  Navigator.SearchGridProvider.Update();
+			  ResetGame();
+			  Bot.Game.RefreshGameID();
 		  }
     }
 }

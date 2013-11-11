@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Zeta;
 
-namespace FunkyBot.ProfileTracking
+namespace FunkyBot.Game
 {
     public class TrackedProfile
     {
@@ -19,27 +19,33 @@ namespace FunkyBot.ProfileTracking
 		public int TotalXP { get; set; }
 		private int StartingXP;
 
+		public int TotalGold { get; set; }
+		private int StartingGold;
+
         public TrackedProfile(string name)
         {
             DeathCount = 0;
 			TotalXP = 0;
 			StartingXP = Bot.Character.CurrentExp;
+			StartingGold = Bot.Character.Coinage;
             ProfileName = name;
             DateStartedProfile = DateTime.Now;
             LootTracker = new LootTracking();
             TotalTimeSpan = new TimeSpan();
         }
 
-		
-        public void UpdateRangeVariables()
-        {
-            TotalTimeSpan=TotalTimeSpan.Add(DateTime.Now.Subtract(DateStartedProfile));
+
+		public void UpdateRangeVariables()
+		{
+			TotalTimeSpan = TotalTimeSpan.Add(DateTime.Now.Subtract(DateStartedProfile));
 			TotalXP += (Bot.Character.CurrentExp - StartingXP);
-        }
+			TotalGold += (Bot.Character.Coinage - StartingGold);
+		}
 		public void RestartRangeVariables()
 		{
 			DateStartedProfile = DateTime.Now;
 			StartingXP = Bot.Character.CurrentExp;
+			StartingGold = Bot.Character.Coinage;
 		}
 
         public override bool Equals(object obj)

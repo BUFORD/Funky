@@ -12,6 +12,7 @@ using System.Globalization;
 using FunkyBot.Settings;
 using Zeta;
 using Zeta.Common;
+using FunkyBot.Game;
 
 namespace FunkyBot
 {
@@ -38,7 +39,7 @@ namespace FunkyBot
 						Settings_Funky.LoadFunkyConfiguration();
 
 						this.Owner=Demonbuddy.App.Current.MainWindow;
-						this.Title="Funky Settings -- " + Bot.CurrentHeroName;
+						this.Title = "Funky Settings -- " + Bot.Game.CurrentHeroName;
 						this.SizeToContent=System.Windows.SizeToContent.WidthAndHeight;
 						this.ResizeMode=System.Windows.ResizeMode.CanMinimize;
 						this.Background=System.Windows.Media.Brushes.Black;
@@ -321,15 +322,15 @@ namespace FunkyBot
 						ListBox lbMiscContent=new ListBox();
 						try
 						{
-                            lbMiscContent.Items.Add(String.Format("Total Stats while running\r\nGameCount: {0} DeathCount: {1} TotalTime: {2} TotalXP:{3}\r\n{4}",
-								Bot.TrackingStats.GameCount, Bot.TrackingStats.TotalDeaths, Bot.TrackingStats.TotalTimeRunning.ToString(@"dd\ \d\ hh\ \h\ mm\ \m\ ss\ \s"), Bot.TrackingStats.TotalXP, Bot.TrackingStats.TotalLootTracker.ToString()));
-                            if (ProfileTracking.TotalStats.ProfilesTracked.Count > 0)
+							lbMiscContent.Items.Add(Bot.Game.TrackingStats.GenerateOutputString());
+
+                            if (TotalStats.ProfilesTracked.Count > 0)
                             {
                                 lbMiscContent.Items.Add("\r\n==Current Game==");
-                                foreach (var item in ProfileTracking.TotalStats.ProfilesTracked)
+                                foreach (var item in TotalStats.ProfilesTracked)
                                 {
-									lbMiscContent.Items.Add(String.Format("{0}\r\nDeaths:{1} TotalTime:{2} TotalXP:{3}\r\n{4}",
-										item.ProfileName, item.DeathCount, item.TotalTimeSpan.ToString(@"hh\ \h\ mm\ \m\ ss\ \s"), item.TotalXP, item.LootTracker.ToString()));
+									lbMiscContent.Items.Add(String.Format("{0}\r\nDeaths:{1} TotalTime:{2} TotalGold:{3} TotalXP:{4}\r\n{5}",
+										item.ProfileName, item.DeathCount, item.TotalTimeSpan.ToString(@"hh\ \h\ mm\ \m\ ss\ \s"), item.TotalGold, item.TotalXP, item.LootTracker.ToString()));
                                 }
                             }
 							 

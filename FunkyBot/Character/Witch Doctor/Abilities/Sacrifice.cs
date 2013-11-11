@@ -24,17 +24,24 @@ namespace FunkyBot.AbilityFunky.Abilities.WitchDoctor
 				Cost=10;
 				Range=48;
 				UseageType=AbilityUseage.Anywhere;
-				Priority=AbilityPriority.None;
+				Priority=AbilityPriority.High;
 				PreCastFlags=(AbilityPreCastFlags.CheckPlayerIncapacitated|AbilityPreCastFlags.CheckCanCast);
-				ElitesWithinRangeConditions=new Tuple<RangeIntervals, int>(RangeIntervals.Range_15, 1);
-				TargetUnitConditionFlags=new UnitTargetConditions(TargetProperties.IsSpecial, 15);
+				//ElitesWithinRangeConditions=new Tuple<RangeIntervals, int>(RangeIntervals.Range_15, 1);
+				TargetUnitConditionFlags=new UnitTargetConditions(TargetProperties.None, falseConditionalFlags: TargetProperties.FullHealth);
+				FcriteriaCombat = new Func<bool>(() =>
+				{
+					if (this.LastUsedMilliseconds > 27000 || Bot.Class.Abilities[SNOPower.Witchdoctor_SummonZombieDog].CheckPreCastConditionMethod())
+						return true;
+
+					return false;
+				});
 		  }
 
 		  #region IAbility
 
 		  public override int RuneIndex
 		  {
-				get { return Bot.Class.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.RuneIndexCache[this.Power]:-1; }
+				get { return Bot.Class.HotBar.RuneIndexCache.ContainsKey(this.Power)?Bot.Class.HotBar.RuneIndexCache[this.Power]:-1; }
 		  }
 
 		  public override int GetHashCode()

@@ -10,7 +10,7 @@ using Zeta.CommonBot;
 using FunkyBot.Cache;
 using FunkyBot.Cache.Enums;
 
-namespace FunkyBot.Cache
+namespace FunkyBot.Character
 {
 
 
@@ -44,32 +44,33 @@ namespace FunkyBot.Cache
 						  CurrentExp = 0;
 					 }
 
+					 #region Events
+
 					 public delegate void LevelAreaIDChanged(int ID);
 					 public event LevelAreaIDChanged OnLevelAreaIDChanged;
 					 private void levelareaIDchanged(int ID)
 					 {
-						  this.iCurrentLevelID=ID;
-						  if (OnLevelAreaIDChanged!=null)
-								this.OnLevelAreaIDChanged(ID);
+						 this.iCurrentLevelID = ID;
+						 if (OnLevelAreaIDChanged != null)
+							 this.OnLevelAreaIDChanged(ID);
 					 }
-
-					 private DateTime lastUpdatedPlayer { get; set; }
-					 internal DateTime lastPreformedNonCombatAction { get; set; }
-
-					 public bool bIsIncapacitated { get; set; }
-					 public bool bIsRooted { get; set; }
-					 public bool bIsInTown { get; set; }
-
-
 
 					 public delegate void HealthValueChanged(double oldvalue, double newvalue);
 					 public event HealthValueChanged OnHealthChanged;
 					 private void healthvalueChanged(double oldvalue, double newvalue)
 					 {
-						  dCurrentHealthPct=newvalue;
-						  if (OnHealthChanged!=null)
-								this.OnHealthChanged(oldvalue, newvalue);
+						 dCurrentHealthPct = newvalue;
+						 if (OnHealthChanged != null)
+							 this.OnHealthChanged(oldvalue, newvalue);
 					 }
+					 
+					 #endregion
+
+					 private DateTime lastUpdatedPlayer { get; set; }
+					 internal DateTime lastPreformedNonCombatAction { get; set; }
+					 public bool bIsIncapacitated { get; set; }
+					 public bool bIsRooted { get; set; }
+					 public bool bIsInTown { get; set; }
 					 private double dcurrentHealthPct;
 					 public double dCurrentHealthPct
 					 {
@@ -83,6 +84,24 @@ namespace FunkyBot.Cache
 					 public double dCurrentEnergyPct { get; set; }
 					 public double dDiscipline { get; set; }
 					 public double dDisciplinePct { get; set; }
+					 internal float fCharacterRadius { get; set; }
+					 internal Sphere CharacterSphere
+					 {
+						 get
+						 {
+							 return new Sphere(Position, fCharacterRadius);
+						 }
+					 }
+					 internal bool CriticalAvoidance { get; set; }
+					 internal int iMyDynamicID { get; set; }
+					 internal int iMyLevel { get; set; }
+					 internal int iTotalPotions { get; set; }
+					 internal int iSceneID { get; set; }
+					 internal Pets PetData { get; set; }
+					 internal Backpack BackPack { get; set; }
+					 internal float PickupRadius { get; set; }
+					 internal int FreeBackpackSlots { get; set; }
+					 internal int CurrentExp { get; set; }
 
 					 private int coinage;
 					 public int Coinage 
@@ -147,31 +166,9 @@ namespace FunkyBot.Cache
 						  }
 					 }
 
-					 //Male Wizard: Radius 5.633342
-					 //Female Demonhunter: Radius 6.437767
-					 internal float fCharacterRadius { get; set; }
 
-					 internal Sphere CharacterSphere
-					 {
-						  get
-						  {
-								return new Sphere(Position, fCharacterRadius);
-						  }
-					 }
 
-					 internal bool CriticalAvoidance { get; set; }
-
-					 internal int iMyDynamicID { get; set; }
-					 internal int iMyLevel { get; set; }
-					 internal int iTotalPotions { get; set; }
-					 internal int iSceneID { get; set; }
-					 internal Pets PetData { get; set; }
-					 internal Backpack BackPack { get; set; }
-					 internal float PickupRadius { get; set; }
-					 internal int FreeBackpackSlots { get; set; }
-					 internal int CurrentExp { get; set; }
-
-					 private AnimationState lastAnimationState=AnimationState.Invalid;
+					private AnimationState lastAnimationState=AnimationState.Invalid;
 					internal AnimationState CurrentAnimationState
 					{
 						get
@@ -249,7 +246,6 @@ namespace FunkyBot.Cache
 									 dCurrentEnergy=me.CurrentPrimaryResource;
 									 dCurrentEnergyPct=dCurrentEnergy/me.MaxPrimaryResource;
 
-
 									 //Critical Avoidance (when no avoidance is set!)
 									 if (dCurrentHealthPct<0.50d&&!Bot.Settings.Avoidance.AttemptAvoidanceMovements&&
 										  !Zeta.CommonBot.PowerManager.CanCast(SNOPower.DrinkHealthPotion))
@@ -284,10 +280,19 @@ namespace FunkyBot.Cache
 										  iCurrentWorldID=ZetaDia.CurrentWorldDynamicId;
 									 }
 
-									if (Bot.CurrentLevel==60)
+									 if (Bot.Game.CurrentLevel == 60)
 										CurrentExp = me.ParagonCurrentExperience;
 									else
 										CurrentExp = me.CurrentExperience;
+
+									 //Set Character Radius?
+									 if (this.fCharacterRadius == 0f)
+									 {
+										 this.fCharacterRadius = me.ActorInfo.Sphere.Radius;
+
+										 //Wizards are short -- causing issues (At least Male Wizard is!)
+										 //if (Bot.Game.ActorClass == ActorClass.Wizard) this.fCharacterRadius += 1f;
+									 }
 									 
 
 									 //Update vars that are not essential to combat (survival).
@@ -358,18 +363,37 @@ namespace FunkyBot.Cache
 									 bKeepLooping=false;
 						  }
 					 }
-
+					/*
+					 * 						  lastUpdatedPlayer=DateTime.Today;
+						  lastPreformedNonCombatAction=DateTime.Today;
+						  bIsIncapacitated=false;
+						  bIsRooted=false;
+						  bIsInTown=false;
+						  dcurrentHealthPct=0d;
+						  dCurrentEnergy=0d;
+						  dCurrentEnergyPct=0d;
+						  dDiscipline=0d;
+						  dDisciplinePct=0d;
+						  iMyDynamicID=0;
+						  iMyLevel=1;
+						  BackPack=new Backpack();
+						  PetData=new Pets();
+						  PickupRadius=1;
+						  fCharacterRadius=0f;
+					 */
 					 public string DebugString()
 					 {
 						  return String.Format("Character Info \r\n"+
-																			 "DynamicID={0} -- WorldID={1} \r\n"+
-																			 "SNOAnim={2} AnimState={3} \r\n" +
-																			 "Incapacitated={4} -- Rooted={5} \r\n" +
-																			 "Current Health={6} -- Current Energy={7}",
-																			 Bot.Character.iMyDynamicID.ToString(), Bot.Character.iCurrentWorldID.ToString(),
+																			 "CurrentLevelID={0} -- WorldID={1} -- SceneID={2} \r\n" +
+																			 "SNOAnim={3} AnimState={4} \r\n" +
+																			 "Incapacitated={5} -- Rooted={6} \r\n" +
+																			 "Current Health={7} -- Current Energy={8}[{9}%] \r\n"+
+																		     "Current Coin={10} -- CurrentXP={11}",
+																			 this.iCurrentLevelID, this.iCurrentWorldID, this.iSceneID,
 																			 this.Lastsnoanim.ToString(), this.lastAnimationState.ToString(),
 																			 Bot.Character.bIsIncapacitated.ToString(), Bot.Character.bIsRooted.ToString(),
-																			 Bot.Character.dcurrentHealthPct.ToString(), Bot.Character.dCurrentEnergyPct.ToString());
+																			 this.dCurrentHealthPct,this.dCurrentEnergy,this.dCurrentEnergyPct,
+																			 this.Coinage,this.CurrentExp);
 
 					 }
 				}

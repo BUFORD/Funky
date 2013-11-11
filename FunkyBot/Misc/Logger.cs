@@ -22,8 +22,9 @@ namespace FunkyBot
 		  Items=128,
 		  OutOfGame=256,
 		  OutOfCombat=512,
+		  Event=1024,
 
-		  All=User|Execption|Cluster|Grouping|Movement|Ability|Target|Items|OutOfGame|OutOfCombat,
+		  All=User|Execption|Cluster|Grouping|Movement|Ability|Target|Items|OutOfGame|OutOfCombat|Event,
 	 }
 	 public static class Logger
 	 {
@@ -109,8 +110,7 @@ namespace FunkyBot
 
 		 internal static void WriteProfileTrackerOutput()
 		  {
-			  string output = String.Format("Total Stats while running\r\nGameCount: {0} DeathCount: {1} TotalTime: {2} TotalXP:{3}\r\n{4}",
-				  Bot.TrackingStats.GameCount, Bot.TrackingStats.TotalDeaths, Bot.TrackingStats.TotalTimeRunning.ToString(@"dd\ \d\ hh\ \h\ mm\ \m\ ss\ \s"), Bot.TrackingStats.TotalXP, Bot.TrackingStats.TotalLootTracker.ToString());
+			  string output = Bot.Game.TrackingStats.GenerateOutputString();
 
 			  string outputPath = Path.Combine(FolderPaths.sTrinityLogPath, "ProfileStats", "Stats - " + LoggingStamp);
 
@@ -202,7 +202,7 @@ namespace FunkyBot
 		  {
 				get
 				{
-					 string sFunkyCharacterFolder=Path.Combine(FolderPaths.sDemonBuddyPath, "Settings", "FunkyBot", Bot.CurrentAccountName);
+					string sFunkyCharacterFolder = Path.Combine(FolderPaths.sDemonBuddyPath, "Settings", "FunkyBot", Bot.Game.CurrentAccountName);
 					 if (!System.IO.Directory.Exists(sFunkyCharacterFolder))
 					 {
 						  Logging.WriteDiagnostic("Creating Funky Settings Folder @ {0}", sFunkyCharacterFolder);
@@ -216,7 +216,7 @@ namespace FunkyBot
 		  {
 				get
 				{
-					 return Path.Combine(sFunkySettingsPath, Bot.CurrentHeroName+".xml");
+					return Path.Combine(sFunkySettingsPath, Bot.Game.CurrentHeroName + ".xml");
 
 				}
 		  }
