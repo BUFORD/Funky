@@ -1,10 +1,9 @@
-﻿using FunkyBot.AbilityFunky;
-using FunkyBot.Cache;
+﻿using FunkyBot.Cache;
+using FunkyBot.Cache.Objects;
 using FunkyBot.Movement.Clustering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace FunkyBot.Targeting
 {
@@ -16,7 +15,7 @@ namespace FunkyBot.Targeting
 		}
 
 
-		private ClusterConditions TargetClusterConditions = new ClusterConditions(Bot.Settings.Cluster.ClusterDistance, 100f, Bot.Settings.Cluster.ClusterMinimumUnitCount, false);
+		private ClusterConditions TargetClusterConditions = new ClusterConditions(Bot.Settings.Cluster.ClusterDistance, Bot.Settings.Cluster.ClusterMaxDistance, Bot.Settings.Cluster.ClusterMinimumUnitCount, false);
 		private ClusterTargetCollection TargetClusterCollection;
 		internal List<int> ValidClusterUnits = new List<int>();
 		internal List<UnitCluster> CurrentGroupClusters = new List<UnitCluster>();
@@ -87,7 +86,7 @@ namespace FunkyBot.Targeting
 
 			//normal clustering
 			if (Bot.Settings.Cluster.EnableClusteringTargetLogic &&
-				 (!Bot.Settings.Cluster.IgnoreClusteringWhenLowHP || Bot.Character.dCurrentHealthPct > Bot.Settings.Cluster.IgnoreClusterLowHPValue))
+				 (!Bot.Settings.Cluster.IgnoreClusteringWhenLowHP || Bot.Character.Data.dCurrentHealthPct > Bot.Settings.Cluster.IgnoreClusterLowHPValue))
 			{
 				if (Bot.Targeting.Environment.UnitRAGUIDs.Count >= Bot.Settings.Cluster.ClusterMinimumUnitCount)
 				{

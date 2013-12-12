@@ -1,3 +1,17 @@
-﻿Melee Line of Sight check against Hovering Units (should check distance before allowing)
+﻿Backtracking:
+	-Either simple return to start of combat location ,
+		-or a queue of multiple locations.
 
-Profile Recycle should be setup to either end game or restart profile.
+	-Queues: Track CacheItems removed that had ShouldLoot flagged.
+			 
+	
+Drop Tracking not reliable
+
+
+Overhaul inventory of character:
+
+-Peroidically updated from Character method
+	*Should be flagged when item becomes target and removed after change event occurs
+-Improve Looting Confirmation
+	*events to confirm flags using cross-reference to what we were attempting prior to change occured.
+

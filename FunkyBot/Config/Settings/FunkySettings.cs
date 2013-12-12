@@ -1,7 +1,4 @@
-﻿using System;
-using Zeta;
-using System.IO;
-using System.Globalization;
+﻿using System.IO;
 using Zeta.Common;
 using System.Xml.Serialization;
 
@@ -16,6 +13,7 @@ namespace FunkyBot.Settings
 				 public SettingTargeting Targeting { get; set; }
 				 public SettingCombat Combat { get; set; }
 				 public SettingAvoidance Avoidance { get; set; }
+				 public SettingBacktrack Backtracking { get; set; }
 
             
              public bool BuyPotionsDuringTownRun { get; set; }
@@ -78,16 +76,17 @@ namespace FunkyBot.Settings
 					  Avoidance=new SettingAvoidance();
                       LOSMovement = new SettingLOSMovement();
 					  Plugin=new SettingPlugin();
-					 
+					  Backtracking = new SettingBacktrack();
 
-                 BuyPotionsDuringTownRun = false;
-					  EnableWaitAfterContainers=false;
 
-                 AfterCombatDelay = 500;
-                 OutOfCombatMovement = false;
-					  AllowBuffingInTown=false;
+					  BuyPotionsDuringTownRun = false;
+					  EnableWaitAfterContainers = false;
 
-                 Class = new ClassSettings();
+					  AfterCombatDelay = 500;
+					  OutOfCombatMovement = false;
+					  AllowBuffingInTown = false;
+
+					  Class = new ClassSettings();
              }
 
 				 //TODO:: Create Abstract Base Class and Derieved Classes for each D3 Class.
@@ -157,38 +156,37 @@ namespace FunkyBot.Settings
 					  //Check for Config file
 					  if (!File.Exists(sFunkyCharacterConfigFile))
 					  {
-							Funky.Log("No config file found, now creating a new config from defaults at: "+sFunkyCharacterConfigFile);
+							Logging.Write("No config file found, now creating a new config from defaults at: "+sFunkyCharacterConfigFile);
 
 
-							if (Bot.Game.CurrentLevel < 60)
+							if (Bot.Character.Account.CurrentLevel < 60)
 							{
-								 Funky.Log("Using Low Level Settings");
-								 bool disableBehaviors=true;
-								 Bot.Settings=new Settings_Funky
+								 Logging.Write("Using Low Level Settings");
+								Bot.Settings=new Settings_Funky
 								 {
-									  Grouping=new SettingGrouping(disableBehaviors),
-									  Cluster=new SettingCluster(disableBehaviors),
-									  Fleeing=new SettingFleeing(disableBehaviors),
+									  Grouping=new SettingGrouping(false),
+									  Cluster = new SettingCluster(false),
+									  Fleeing = new SettingFleeing(false),
 								 };
 							}
 							else
 							{
-								if (Bot.Game.ActorClass == Zeta.Internals.Actors.ActorClass.Barbarian || Bot.Game.ActorClass == Zeta.Internals.Actors.ActorClass.Monk)
-								 {
-									  Funky.Log("Using Melee Inferno Default Settings");
-									  Settings_Funky settings=Settings_Funky.DeserializeFromXML(Path.Combine(FolderPaths.SettingsDefaultPath, "InfernoMelee.xml"));
-								 }
-								 else
-								 {
-									  Funky.Log("Using Ranged Inferno Default Settings");
-									  Settings_Funky settings=Settings_Funky.DeserializeFromXML(Path.Combine(FolderPaths.SettingsDefaultPath, "InfernoRanged.xml"));
-								 }
+								if (Bot.Character.Account.ActorClass == Zeta.Internals.Actors.ActorClass.Barbarian || Bot.Character.Account.ActorClass == Zeta.Internals.Actors.ActorClass.Monk)
+								{
+									Logging.Write("Using Melee Inferno Default Settings");
+									DeserializeFromXML(Path.Combine(FolderPaths.SettingsDefaultPath, "InfernoMelee.xml"));
+								}
+								else
+								{
+									Logging.Write("Using Ranged Inferno Default Settings");
+									DeserializeFromXML(Path.Combine(FolderPaths.SettingsDefaultPath, "InfernoRanged.xml"));
+								}
 							}
 
-							Settings_Funky.SerializeToXML(Bot.Settings);
+							SerializeToXML(Bot.Settings);
 					  }
 
-					  Bot.Settings=Settings_Funky.DeserializeFromXML();
+					  Bot.Settings=DeserializeFromXML();
 				 }
 				 public static void SerializeToXML(Settings_Funky settings)
 				 {

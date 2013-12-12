@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using FunkyBot.Cache.Objects;
+using FunkyBot.XMLTags;
 using Zeta.Common;
 using Zeta.CommonBot;
 using Zeta.CommonBot.Profile;
-using Zeta.CommonBot.Settings;
 using Zeta.CommonBot.Profile.Common;
 using FunkyBot.Cache;
 
@@ -19,16 +20,18 @@ namespace FunkyBot.Game
 		  internal static Dictionary<int, int> dictRandomID=new Dictionary<int, int>();
 
 
-
-		  internal Dictionary<int, Cache.CacheObject> InteractableObjectCache = new Dictionary<int, Cache.CacheObject>();
-		  private bool profileBehaviorIsOOCInteractive=false;
-		  internal bool ProfileBehaviorIsOOCInteractive
+		  internal bool PreformingInteractiveBehavior
 		  {
-				get { return profileBehaviorIsOOCInteractive; }
-				set { profileBehaviorIsOOCInteractive=value; }
+			  get
+			  {
+				  return IsRunningOOCBehavior && ProfileBehaviorIsOOCInteractive && InteractableCachedObject != null;
+			  }
 		  }
 
-		  internal CacheObject InteractableCachedObject = null;
+		  internal Dictionary<int, CacheObject> InteractableObjectCache = new Dictionary<int, CacheObject>();
+		 internal bool ProfileBehaviorIsOOCInteractive { get; set; }
+
+		 internal CacheObject InteractableCachedObject = null;
 
 		  private ProfileBehavior currentProfileBehavior;
 		  internal ProfileBehavior CurrentProfileBehavior
@@ -63,7 +66,7 @@ namespace FunkyBot.Game
 								  ProfileBehaviorIsOOCInteractive = true;
 								  Logging.WriteDiagnostic("Interactable Profile Tag!");
 
-								  InteractableCachedObject = ProfileCache.GetInteractiveCachedObject(currentProfileBehavior);
+								  InteractableCachedObject = GetInteractiveCachedObject(currentProfileBehavior);
 								  if (InteractableCachedObject != null)
 									  Logging.WriteDiagnostic("Found Cached Interactable Server Object");
 								  
@@ -113,7 +116,7 @@ namespace FunkyBot.Game
 					 if (tagUseObj.ActorId>0)
 					 {//Using SNOID..
 						 var Objects = Bot.Game.Profile.InteractableObjectCache.Values.Where(obj => obj.SNOID == tagUseObj.ActorId);
-						 foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Position)))
+						 foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Data.Position)))
 						 {
 							 //Found matching object!
 							 return item;
@@ -136,7 +139,7 @@ namespace FunkyBot.Game
 					  if (tagUsePortal.ActorId > 0)
 					  {//Using SNOID..
 						  var Objects = Bot.Game.Profile.InteractableObjectCache.Values.Where(obj => obj.SNOID == tagUsePortal.ActorId);
-						  foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Position)))
+						  foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Data.Position)))
 						  {
 							  //Found matching object!
 							  return item;
@@ -147,7 +150,7 @@ namespace FunkyBot.Game
 					  {//use position to match object
 						  Vector3 tagPosition = tagUsePortal.Position;
 						  var Objects = Bot.Game.Profile.InteractableObjectCache.Values.Where(obj => obj.Position.Distance(tagPosition) <= 100f);
-						  foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Position)))
+						  foreach (CacheObject item in Objects.OrderBy(obj => obj.Position.Distance(Bot.Character.Data.Position)))
 						  {
 							  //Found matching object!
 							  return item;
@@ -162,21 +165,26 @@ namespace FunkyBot.Game
 		 //Common Used Profile Tags that should be considered Out-Of-Combat Behavior.
 		 private static readonly HashSet<Type> oocDBTags = new HashSet<Type> 
 																	{ 
-																	  typeof(Zeta.CommonBot.Profile.Common.UseWaypointTag), 
-																	  typeof(Zeta.CommonBot.Profile.Common.UseObjectTag),
-																	  typeof(Zeta.CommonBot.Profile.Common.UseTownPortalTag),
+																	  typeof(UseWaypointTag), 
+																	  typeof(UseObjectTag),
+																	  typeof(UseTownPortalTag),
 																	  //typeof(Zeta.CommonBot.Profile.Common.WaitTimerTag),
-																	  typeof (FunkyBot.XMLTags.TrinityTownPortal),
+																	  typeof (TrinityTownPortal),
 																	};
 
 		 //Common Used Profile Tags that requires backtracking during combat sessions.
 		 private static readonly HashSet<Type> InteractiveTags = new HashSet<Type> 
 																	{ 
-																	  typeof(Zeta.CommonBot.Profile.Common.UseWaypointTag), 
-																	  typeof(Zeta.CommonBot.Profile.Common.UseObjectTag),
+																	  typeof(UseWaypointTag), 
+																	  typeof(UseObjectTag),
 																	  //typeof(Zeta.CommonBot.Profile.Common.UseTownPortalTag),
-																	  typeof(Zeta.CommonBot.Profile.Common.UsePortalTag),
+																	  typeof(UsePortalTag),
 																	};
+
+		 public ProfileCache()
+		 {
+			 ProfileBehaviorIsOOCInteractive = false;
+		 }
 	 }
 }
 
