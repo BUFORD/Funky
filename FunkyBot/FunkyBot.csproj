@@ -72,8 +72,7 @@
     <Compile Include="Player\Account.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Config\Settings\FunkySettingsExtensions.cs" />
-    <Compile Include="Behaviors\Townrun\FinishOverlord.cs">
+    <Compile Include="Config\Settings\FunkySettingsExtensions.cs" />    
     <Compile Include="Player\HotBar\Skills\Conditions\SkillClusterConditions.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

@@ -20,16 +20,10 @@ namespace FunkyBot.Player.HotBar.Skills.Barb
 				Cost=20;
 				IsBuff=true;
 				UseageType=AbilityUseage.Anywhere;
-				Priority=AbilityPriority.High;
-				PreCast=new SkillPreCast((AbilityPreCastFlags.CheckEnergy|AbilityPreCastFlags.CheckPlayerIncapacitated|AbilityPreCastFlags.CheckCanCast));
-				FcriteriaBuff=() => !Bot.Character.Class.HotBar.HasBuff(SNOPower.Barbarian_BattleRage);
-				FcriteriaCombat=() => !Bot.Character.Class.HotBar.HasBuff(SNOPower.Barbarian_BattleRage)||
-				                      //Only if we cannot spam sprint..
-				                      (!Bot.Character.Class.HotBar.HotbarPowers.Contains(SNOPower.Barbarian_Sprint)&&
-				                       ((Bot.Settings.Class.bFuryDumpWrath&&Bot.Character.Data.dCurrentEnergyPct>=0.98&&
-				                         Bot.Character.Class.HotBar.HasBuff(SNOPower.Barbarian_WrathOfTheBerserker)
-				                         &&Bot.Character.Data.dCurrentHealthPct>0.50d)||
-				                        (Bot.Settings.Class.bFuryDumpAlways&&Bot.Character.Data.dCurrentEnergyPct>=0.98&&Bot.Character.Data.dCurrentHealthPct>0.50d)));
+                Priority = AbilityPriority.Low;
+                PreCast = new SkillPreCast(AbilityPreCastFlags.CheckExisitingBuff|AbilityPreCastFlags.CheckEnergy | AbilityPreCastFlags.CheckPlayerIncapacitated | AbilityPreCastFlags.CheckCanCast);
+				FcriteriaBuff=() => true;
+				FcriteriaCombat=() =>  true;
 		  }
 
 		  #region IAbility
