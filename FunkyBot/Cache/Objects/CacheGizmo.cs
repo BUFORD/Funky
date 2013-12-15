@@ -84,8 +84,8 @@ namespace FunkyBot.Cache.Objects
 								this.ref_Gizmo=(DiaGizmo)base.ref_DiaObject;
 						  } catch
 						  {
-								if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Execption))
-									 Logger.Write(LogLevel.Execption, "Failure to convert obj to DiaItem!");
+							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								  Logger.Write(LogLevel.Cache, "Failure to convert obj to DiaItem!");
 
 
 								NeedsRemoved = true;
@@ -94,16 +94,16 @@ namespace FunkyBot.Cache.Objects
 					 }
 
 					 //Destructibles are not important unless they are close.. 40f is minimum range!
-					 if ((this.targetType.Value == TargetType.Destructible || this.targetType.Value == TargetType.Barricade) && this.CentreDistance > 40f)
-					 {
-						 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-							Logger.Write(LogLevel.Target, "Removing Destructible/Barricade {0} out of range!", InternalName);
+					 //if ((this.targetType.Value == TargetType.Destructible || this.targetType.Value == TargetType.Barricade) && this.CentreDistance > 40f)
+					 //{
+					 //	if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+					 //		Logger.Write(LogLevel.Cache, "Removing Destructible/Barricade {0} out of range!", InternalName);
 
-						 this.BlacklistLoops = 12;
-						 return false;
-					 }
+					 //	this.BlacklistLoops = 12;
+					 //	return false;
+					 //}
 
-					 if ((TargetType.Interactables.HasFlag(base.targetType.Value))
+					 if ((ObjectCache.CheckTargetTypeFlag(targetType.Value,TargetType.Interactables))
 						  &&(!this.GizmoHasBeenUsed.HasValue||!this.GizmoHasBeenUsed.Value))
 					 {
 						  try
@@ -136,16 +136,16 @@ namespace FunkyBot.Cache.Objects
 								}
 						  } catch
 						  {
-								if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Execption))
-									 Logger.Write(LogLevel.Execption, "Safely handled getting attribute GizmoHasBeenOperated gizmo {0}", this.InternalName);
+							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								  Logger.Write(LogLevel.Cache, "Safely handled getting attribute GizmoHasBeenOperated gizmo {0}", this.InternalName);
 								return false;
 						  }
 
 						  //Blacklist used gizmos.
 						  if (this.GizmoHasBeenUsed.HasValue&&this.GizmoHasBeenUsed.Value)
 						  {
-							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-								  Logger.Write(LogLevel.Target, "Removing {0} Has Been Used!", InternalName);
+							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								  Logger.Write(LogLevel.Cache, "Removing {0} Has Been Used!", InternalName);
 
 								this.BlacklistFlag=BlacklistType.Permanent;
 								this.NeedsRemoved=true;
@@ -160,33 +160,36 @@ namespace FunkyBot.Cache.Objects
 						  base.Obstacletype=ObstacleType.ServerObject;
 
 					 //PhysicsSNO -- (continiously updated) excluding shrines/interactables
-					 if (base.targetType.Value==TargetType.Destructible||base.targetType.Value==TargetType.Barricade||base.targetType.Value==TargetType.Container)
+					 if (ObjectCache.CheckTargetTypeFlag(targetType.Value, TargetType.Destructible | TargetType.Barricade |TargetType.Container))
 					 {
 						  try
 						  {
 								this.PhysicsSNO=base.ref_DiaObject.PhysicsSNO;
 						  } catch
 						  {
-								if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Execption))
-									 Logger.Write(LogLevel.Execption, "Safely handled exception getting physics SNO for object "+this.InternalName+" ["+this.SNOID+"]");
+							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								  Logger.Write(LogLevel.Cache, "Safely handled exception getting physics SNO for object " + this.InternalName + " [" + this.SNOID + "]");
 								return false;
 						  }
 					 }
 
-					//Update SNOAnim
-					if (targetType.Value==TargetType.Destructible)
-					{
-						try
-						{
-							AnimState=(base.ref_DiaObject.CommonData.AnimationState);
-						}
-						catch
-						{
-							AnimState=AnimationState.Invalid;
-						}
-					}
+					////Update SNOAnim
+					 if (ObjectCache.CheckTargetTypeFlag(targetType.Value,TargetType.Destructible| TargetType.Barricade))
+					 {
+						 try
+						 {
+							 UpdateAnimationState();
+							 UpdateSNOAnim();
+						 }
+						 catch
+						 {
+							 if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								 Logger.Write(LogLevel.Cache, "Exception occured attempting to update AnimState for object {0}", InternalName);
+							 //AnimState=AnimationState.Invalid;
+						 }
+					 }
 
-					 if (this.targetType.Value==TargetType.Destructible||this.targetType.Value==TargetType.Barricade||this.targetType.Value==TargetType.Interactable)
+					 if (ObjectCache.CheckTargetTypeFlag(targetType.Value,TargetType.Destructible|TargetType.Barricade|TargetType.Interactable))
 					 {
 						  if (this.IsBarricade.HasValue&&this.IsBarricade.Value&&!this.targetType.Value.HasFlag(TargetType.Barricade))
 						  {

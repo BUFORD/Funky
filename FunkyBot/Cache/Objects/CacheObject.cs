@@ -108,22 +108,36 @@ namespace FunkyBot.Cache.Objects
 
 				private SNOAnim _snoAnim = SNOAnim.Invalid;
 				public SNOAnim SnoAnim { get { return _snoAnim; } set { _snoAnim = value; } }
-				//{
-				//	 //Return live data.
-				//	 get
-				//	 {
-				//		  using (ZetaDia.Memory.AcquireFrame())
-				//		  {
-				//				try
-				//				{
-				//					 return (ref_DiaObject.CommonData.AnimationState);
-				//				} catch (Exception)
-				//				{
-				//					 return AnimationState.Invalid;
-				//				}
-				//		  }
-				//	 }
-				//}
+				public void UpdateAnimationState()
+				{
+					//Return live data.
+					using (ZetaDia.Memory.AcquireFrame())
+					{
+						try
+						{
+							_animationState = ref_DiaObject.CommonData.AnimationState;
+						}
+						catch (Exception)
+						{
+							_animationState = AnimationState.Invalid;
+						}
+					}
+				}
+				public void UpdateSNOAnim()
+				{
+					//Return live data.
+					using (ZetaDia.Memory.AcquireFrame())
+					{
+						try
+						{
+							_snoAnim = ref_DiaObject.CommonData.CurrentAnimation;
+						}
+						catch (Exception)
+						{
+							_snoAnim = SNOAnim.Invalid;
+						}
+					}
+				}
 
 				///<summary>
 				///Used only if the object is a summonable pet.
@@ -202,7 +216,8 @@ namespace FunkyBot.Cache.Objects
 								Position=ref_DiaObject.Position;
 						  } catch (NullReferenceException)
 						  {
-								Logging.WriteVerbose("Safely Handled Updating Position for Object {0}", InternalName);
+							  if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+								Logger.Write(LogLevel.Cache, "Safely Handled Updating Position for Object {0}", InternalName);
 						  }
 						  lastUpdatedPosition=DateTime.Now;
 						  positionUpdated=true;
@@ -612,10 +627,10 @@ namespace FunkyBot.Cache.Objects
 				{
 					 get
 					 {
-						  return String.Format("RAGUID {0}: \r\n {1} Distance (Centre{2} / Radius{3}) \r\n SnoAnim={9} \r\n ReqLOS={4} -- {5} -- [LOSV3: {6}] \r\n BotFacing={7} \r\n BlackListLoops[{8}]",
+						  return String.Format("RAGUID {0}: \r\n {1} Distance (Centre{2} / Radius{3}) \r\n SnoAnim={9} -- AnimState={10} \r\n ReqLOS={4} -- {5} -- [LOSV3: {6}] \r\n BotFacing={7} \r\n BlackListLoops[{8}]",
 								RAGUID.ToString(CultureInfo.InvariantCulture), base.DebugString, CentreDistance.ToString(CultureInfo.InvariantCulture), RadiusDistance.ToString(CultureInfo.InvariantCulture),
 								RequiresLOSCheck, LineOfSight!=null?String.Format("-- {0} --",LineOfSight.DebugString):"", LOSV3,
-								BotIsFacing(), BlacklistLoops.ToString(CultureInfo.InvariantCulture), AnimState);
+								BotIsFacing(), BlacklistLoops.ToString(CultureInfo.InvariantCulture), SnoAnim, AnimState);
 					 }
 				}
 

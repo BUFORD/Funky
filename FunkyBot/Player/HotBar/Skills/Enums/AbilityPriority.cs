@@ -9,9 +9,10 @@
 			//Low is used for costing abilities.
 			//High is used for buffs.
 
-        None = 0,
-        Low = 1,
-        High = 2,
-        Highest = 3
+			None=0,
+			Low=1,
+			Medium=2,
+			High=3,
+            Highest=4
 	 }
 }
