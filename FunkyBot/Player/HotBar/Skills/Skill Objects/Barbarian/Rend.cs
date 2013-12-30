@@ -14,7 +14,7 @@ namespace FunkyBot.Player.HotBar.Skills.Barb
 
         public override void Initialize()
         {
-            Cooldown = 3500;
+            Cooldown = 2500;
             ExecutionType = AbilityExecuteFlags.Self;
             WaitVars = new WaitLoops(3, 3, true);
             Cost = 20;
