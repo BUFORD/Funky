@@ -66,13 +66,15 @@
     <Compile Include="DBHandlers\ItemIDOverlord.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="Misc\GoldInactivity.cs" />
+    <Compile Include="Navigation\StuckManager.cs" />
     <Compile Include="Player\Character.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Player\Account.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Config\Settings\FunkySettingsExtensions.cs" />    
+    <Compile Include="Config\Settings\FunkySettingsExtensions.cs" />
     <Compile Include="Player\HotBar\Skills\Conditions\SkillClusterConditions.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
