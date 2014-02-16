@@ -66,8 +66,10 @@
     <Compile Include="DBHandlers\ItemIDOverlord.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Misc\GoldInactivity.cs" />
     <Compile Include="Navigation\StuckManager.cs" />
+    <Compile Include="Game\GoldInactivity.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Player\Character.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -912,12 +914,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.0.1560.323, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
+    <Reference Include="Demonbuddy, Version=1.0.1583.325, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Assemblies\Demonbuddy.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="GreyMagic, Version=1.0.1560.323, Culture=neutral, PublicKeyToken=260525fa2b0e778a, processorArchitecture=x86">
+    <Reference Include="GreyMagic, Version=1.0.1583.325, Culture=neutral, PublicKeyToken=260525fa2b0e778a, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Assemblies\GreyMagic.dll</HintPath>
       <Private>False</Private>
@@ -1046,9 +1048,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Misc\Prowl.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Misc\Helper.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
