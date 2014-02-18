@@ -120,8 +120,7 @@ namespace FunkyBot.Movement
 			#region Non Movement Counter Reached
 			if (NonMovementCounter > Bot.Settings.Plugin.MovementNonMovementCount)
 			{
-				if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
-					Logger.Write(LogLevel.Movement, "non movement counter reached {0}", NonMovementCounter);
+				Logger.Write(LogLevel.Movement, "non movement counter reached {0}", NonMovementCounter);
 
 				if (obj.Actortype.HasValue && obj.Actortype.Value.HasFlag(ActorType.Item))
 				{
@@ -144,8 +143,7 @@ namespace FunkyBot.Movement
 						obj.RequiresLOSCheck = true;
 						obj.BlacklistLoops = 50;
 
-						if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-							Logger.Write(LogLevel.Movement, "Ignoring Item {0} -- due to RayCast Failure!", obj.InternalName);
+						Logger.Write(LogLevel.Movement, "Ignoring Item {0} -- due to RayCast Failure!", obj.InternalName);
 
 						Bot.Targeting.bForceTargetUpdate = true;
 						return RunStatus.Running;
@@ -154,8 +152,7 @@ namespace FunkyBot.Movement
 				else if (ObjectCache.CheckTargetTypeFlag(obj.targetType.Value, TargetType.LineOfSight | TargetType.Backtrack))
 				{
 
-					if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-						Logger.Write(LogLevel.Movement, "Line of Sight Movement Stalled!");
+					Logger.Write(LogLevel.Movement, "Line of Sight Movement Stalled!");
 
 					Bot.NavigationCache.LOSmovementObject = null;
 					Bot.Targeting.bForceTargetUpdate = true;
@@ -165,8 +162,7 @@ namespace FunkyBot.Movement
 				}
 				else
 				{
-					if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-						Logger.Write(LogLevel.Movement, "Ignoring obj {0} ", obj.InternalName + " _ SNO:" + obj.SNOID);
+					Logger.Write(LogLevel.Movement, "Ignoring obj {0} ", obj.InternalName + " _ SNO:" + obj.SNOID);
 					obj.BlacklistLoops = 50;
 					obj.RequiresLOSCheck = true;
 					Bot.Targeting.bForceTargetUpdate = true;
@@ -175,7 +171,7 @@ namespace FunkyBot.Movement
 					// Reset the emergency loop counter and return success
 					return RunStatus.Running;
 				}
-			} 
+			}
 			#endregion
 
 			//update misc movement info (rotation, state, flags, etc)
@@ -187,7 +183,7 @@ namespace FunkyBot.Movement
 			#region Evaluate Last Action
 
 			// Position didn't change last update.. check if we are stuck!
-			if (DateTime.Now.Subtract(lastPositionChange).TotalMilliseconds>150 &&
+			if (DateTime.Now.Subtract(lastPositionChange).TotalMilliseconds > 150 &&
 				(!Bot.NavigationCache.IsMoving || Bot.NavigationCache.currentMovementState == MovementState.WalkingInPlace || Bot.NavigationCache.currentMovementState.Equals(MovementState.None)))
 			{
 				bForceNewMovement = true;
@@ -204,8 +200,7 @@ namespace FunkyBot.Movement
 						case 3:
 							if (Bot.NavigationCache.groupRunningBehavior)
 							{
-								if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
-									Logger.Write(LogLevel.Movement, "Grouping Behavior stopped due to blocking counter");
+								Logger.Write(LogLevel.Movement, "Grouping Behavior stopped due to blocking counter");
 
 								Bot.NavigationCache.GroupingFinishBehavior();
 								Bot.NavigationCache.groupingSuspendedDate = DateTime.Now.AddMilliseconds(4000);
@@ -227,8 +222,7 @@ namespace FunkyBot.Movement
 										{
 											obj.RequiresLOSCheck = true;
 											obj.BlacklistLoops = 10;
-											if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Target))
-												Logger.Write(LogLevel.Movement, "Ignoring object " + obj.InternalName + " due to not moving and raycast failure!", true);
+											Logger.Write(LogLevel.Movement, "Ignoring object " + obj.InternalName + " due to not moving and raycast failure!", true);
 
 											Bot.Targeting.bForceTargetUpdate = true;
 											return RunStatus.Running;
@@ -245,8 +239,7 @@ namespace FunkyBot.Movement
 							{
 								if (!Navigation.CanRayCast(Bot.Character.Data.Position, CurrentTargetLocation, NavCellFlags.AllowWalk))
 								{
-									if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Movement))
-										Logger.Write(LogLevel.Movement, "Cannot continue with avoidance movement due to raycast failure!");
+									Logger.Write(LogLevel.Movement, "Cannot continue with avoidance movement due to raycast failure!");
 									BlockedMovementCounter = 0;
 
 									Bot.NavigationCache.CurrentGPArea.BlacklistLastSafespot();
@@ -366,23 +359,23 @@ namespace FunkyBot.Movement
 				if (ObjectCache.CheckTargetTypeFlag(obj.targetType.Value, TargetType.AvoidanceMovements))
 				{
 					if (NonMovementCounter < 10 || currentDistance > 50f)
-						UsePowerMovement=false;
+						UsePowerMovement = false;
 				}
 				else if (ObjectCache.CheckTargetTypeFlag(obj.targetType.Value, TargetType.LineOfSight | TargetType.Backtrack))
 				{
-					if (currentDistance>30f)
-						UsePowerMovement=false;
+					if (currentDistance > 30f)
+						UsePowerMovement = false;
 				}
 				else
 				{
 					//Use Walk Power when not using LOS Movement, target is not an item and target does not ignore LOS.
-					if (!(NonMovementCounter < 10 && 
-						!obj.UsingLOSV3 && 
+					if (!(NonMovementCounter < 10 &&
+						!obj.UsingLOSV3 &&
 						!obj.IgnoresLOSCheck &&
-						 obj.targetType.Value != TargetType.Item && 
+						 obj.targetType.Value != TargetType.Item &&
 						 obj.targetType.Value != TargetType.Interactable))
 					{
-						UsePowerMovement=false;
+						UsePowerMovement = false;
 					}
 				}
 

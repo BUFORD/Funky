@@ -21,7 +21,7 @@ namespace FunkyBot.Targeting
 		internal List<UnitCluster> CurrentGroupClusters = new List<UnitCluster>();
 
 
-	
+
 
 		private DateTime LastClusterGroupingLogicRefresh = DateTime.MinValue;
 
@@ -33,8 +33,7 @@ namespace FunkyBot.Targeting
 		{
 			if (!AbilityClusters.ContainsKey(CC))
 			{
-				if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cluster))
-					Logger.Write(LogLevel.Cluster, "Creating new entry for ClusterConditions -- {0}", CC.ToString());
+				Logger.Write(LogLevel.Cluster, "Creating new entry for ClusterConditions -- {0}", CC.ToString());
 				AbilityClusters.Add(CC, new ClusterCollection(CC, 400, 200));
 			}
 

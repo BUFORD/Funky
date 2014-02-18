@@ -251,13 +251,12 @@ namespace FunkyBot.Cache
 								}
 								catch
 								{
-									if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+									
 										Logger.Write(LogLevel.Cache, "Failed to create projectile avoidance with rotation and speed. {0}", tmp_CachedObj.InternalName);
 								}
 							}
 							else if (tmp_CachedObj.IsAvoidance)
 							{
-
 								//Poison Gas Can Be Friendly...
 								if (AvoidanceType == AvoidanceType.PoisonGas)
 								{
@@ -268,7 +267,7 @@ namespace FunkyBot.Cache
 									}
 									catch
 									{
-										if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.Cache))
+										
 											Logger.Write(LogLevel.Cache, "Failed to retrieve TeamID attribute for object {0}", thisObstacle.InternalName);
 									}
 

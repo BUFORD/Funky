@@ -28,13 +28,7 @@ namespace FunkyBot.DBHandlers
 
         internal static RunStatus TownRunFinishBehavior(object ret)
         {//Return to the town portal
-            if (TownRunFromInactivity)
-            {
-                Logging.Write("[GoldInactivity] TownRunFromInactivity");
-                TownRunFromInactivity = false;
-                ZetaDia.Service.Party.LeaveGame();
-                EventHandlers.FunkyOnLeaveGame(null, null);
-            }
+
             //Check if town portal object is present
             if (!FoundTownPortal)
             {

@@ -19,7 +19,7 @@ namespace FunkyBot.Game
 		///</summary>
 		internal GameStats CurrentGameStats = new GameStats();
 
-		internal GoldInactivity GoldTimeoutChecker=new GoldInactivity();
+		internal GoldInactivity GoldTimeoutChecker = new GoldInactivity();
 
 
 		internal ProfileCache Profile = new ProfileCache();
@@ -35,10 +35,9 @@ namespace FunkyBot.Game
 
 			if (!curgameID.Equals(_currentGameId))
 			{
-				if (Bot.Settings.Debug.FunkyLogFlags.HasFlag(LogLevel.OutOfCombat))
-				{
-					Logger.Write(LogLevel.OutOfCombat, "New Game Started");
-				}
+
+				Logger.Write(LogLevel.OutOfCombat, "New Game Started");
+
 
 				//Merge last GameStats with the Total
 				TrackingStats.GameChanged(ref CurrentGameStats);
@@ -62,7 +61,7 @@ namespace FunkyBot.Game
 				Funky.ResetBot();
 
 				//Gold Inactivity
-				GoldTimeoutChecker.LastCoinageUpdate=DateTime.Now;
+				GoldTimeoutChecker.LastCoinageUpdate = DateTime.Now;
 
 				_currentGameId = curgameID;
 				return true;

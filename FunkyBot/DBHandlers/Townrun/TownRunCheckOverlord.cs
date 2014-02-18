@@ -48,7 +48,6 @@ namespace FunkyBot.DBHandlers
 		// Stash mapper - it's an array representing every slot in your stash, true or false dictating if the slot is free or not
 		private static bool[,] GilesStashSlotBlocked = new bool[7, 30];
 		internal static bool TownrunStartedInTown = true;
-        public static bool TownRunFromInactivity = false;
 
 		// **********************************************************************************************
 		// *****         TownRunCheckOverlord - determine if we should do a town-run or not         *****
