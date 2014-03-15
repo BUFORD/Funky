@@ -1,5 +1,5 @@
 ﻿using FunkyBot.Player.HotBar.Skills.Conditions;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors;
 
 namespace FunkyBot.Player.HotBar.Skills.Monk
 {
@@ -16,15 +16,15 @@ namespace FunkyBot.Player.HotBar.Skills.Monk
 				Priority=AbilityPriority.High;
 				PreCast=new SkillPreCast((AbilityPreCastFlags.CheckEnergy));
 				IsSpecialAbility=true;
-				FcriteriaBuff=() => !Bot.Character.Class.HotBar.HasBuff(Power);
+				FcriteriaBuff=() => !Bot.Character.Class.HotBar.HasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2_Passive);
 
-				FcriteriaCombat=() => !Bot.Character.Class.HotBar.HasBuff(Power)
+				FcriteriaCombat = () => !Bot.Character.Class.HotBar.HasBuff(SNOPower.X1_Monk_MantraOfEvasion_v2_Passive)
 				                      ||
 				                      Bot.Settings.Class.bMonkSpamMantra&&Bot.Targeting.CurrentTarget!=null&&
 				                      (Bot.Targeting.Environment.iElitesWithinRange[(int)RangeIntervals.Range_25]>0||
 				                       Bot.Targeting.Environment.iAnythingWithinRange[(int)RangeIntervals.Range_20]>=2||
 				                       (Bot.Targeting.Environment.iAnythingWithinRange[(int)RangeIntervals.Range_20]>=1&&Bot.Settings.Class.bMonkInnaSet)||
-				                       (Bot.Targeting.CurrentUnitTarget.IsEliteRareUnique||Bot.Targeting.CurrentTarget.IsBoss)&&
+									   (Bot.Targeting.CurrentUnitTarget.IsEliteRareUnique || Bot.Targeting.CurrentTarget.IsBoss) &&
 				                       Bot.Targeting.CurrentTarget.RadiusDistance<=25f)&&
 				                      // Check if either we don't have blinding flash, or we do and it's been cast in the last 6000ms
 				                      //DateTime.Now.Subtract(dictAbilityLastUse[SNOPower.Monk_BlindingFlash]).TotalMilliseconds <= 6000)) &&
@@ -59,7 +59,7 @@ namespace FunkyBot.Player.HotBar.Skills.Monk
 
 		  public override SNOPower Power
 		  {
-				get { return SNOPower.Monk_MantraOfEvasion; }
+				get { return SNOPower.X1_Monk_MantraOfEvasion_v2; }
 		  }
 	 }
 }

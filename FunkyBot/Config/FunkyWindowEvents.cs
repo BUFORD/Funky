@@ -9,14 +9,15 @@ using FunkyBot.Cache;
 using FunkyBot.Cache.Objects;
 using FunkyBot.Settings;
 using System.Windows.Controls;
+using Zeta.Bot;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.Internals.Actors;
+using Zeta.Game.Internals.Actors;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using MessageBox = System.Windows.MessageBox;
 using Orientation = System.Windows.Controls.Orientation;
 using RadioButton = System.Windows.Controls.RadioButton;
+using UIElement = Zeta.Game.Internals.UIElement;
 
 namespace FunkyBot
 {
@@ -34,12 +35,15 @@ namespace FunkyBot
 
 			try
 			{
+				//var settingsForm = new SettingsForm();
+				//settingsForm.ShowDialog();
+
 				funkyConfigWindow = new FunkyWindow();
 				funkyConfigWindow.Show();
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteVerbose("Failure to initilize Funky Setting Window! \r\n {0} \r\n {1} \r\n {2}", ex.Message, ex.Source, ex.StackTrace);
+				Logger.DBLog.InfoFormat("Failure to initilize Funky Setting Window! \r\n {0} \r\n {1} \r\n {2}", ex.Message, ex.Source, ex.StackTrace);
 			}
 		}
 
@@ -64,7 +68,7 @@ namespace FunkyBot
 			if (confirm == MessageBoxResult.Yes)
 			{
 				string DefaultLeveling = Path.Combine(FolderPaths.sTrinityPluginPath, "Config", "Defaults", "LowLevel.xml");
-				Logging.Write("Creating new settings for {0} -- {1} using file {2}", Bot.Character.Account.CurrentAccountName, Bot.Character.Account.CurrentHeroName, DefaultLeveling);
+				Logger.DBLog.InfoFormat("Creating new settings for {0} -- {1} using file {2}", Bot.Character.Account.CurrentAccountName, Bot.Character.Account.CurrentHeroName, DefaultLeveling);
 				Settings_Funky newSettings = Settings_Funky.DeserializeFromXML(DefaultLeveling);
 				Bot.Settings = newSettings;
 				funkyConfigWindow.Close();
@@ -88,7 +92,7 @@ namespace FunkyBot
 					MessageBoxResult confirm = MessageBox.Show(funkyConfigWindow, "Are you sure you want to overwrite settings with selected profile?", "Confirm Overwrite", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 					if (confirm == MessageBoxResult.Yes)
 					{
-						Logging.Write("Creating new settings for {0} -- {1} using file {2}", Bot.Character.Account.CurrentAccountName, Bot.Character.Account.CurrentHeroName, OFD.FileName);
+						Logger.DBLog.InfoFormat("Creating new settings for {0} -- {1} using file {2}", Bot.Character.Account.CurrentAccountName, Bot.Character.Account.CurrentHeroName, OFD.FileName);
 						Settings_Funky newSettings = Settings_Funky.DeserializeFromXML(OFD.FileName);
 						Bot.Settings = newSettings;
 						funkyConfigWindow.Close();
@@ -186,7 +190,7 @@ namespace FunkyBot
 
 				#endregion
 
-				Logging.WriteVerbose("Dumping Object Cache");
+				Logger.DBLog.InfoFormat("Dumping Object Cache");
 
 				OutPut += "\r\n";
 				try
@@ -218,14 +222,14 @@ namespace FunkyBot
 					return;
 				}
 
-				Logging.WriteDiagnostic(OutPut);
+				Logger.DBLog.DebugFormat(OutPut);
 
 			}
 			else if (btnsender.Name == "Obstacles")
 			{
 				LBDebug.Items.Add(ObjectCache.Obstacles.DumpDebugInfo());
-
-				Logging.WriteVerbose("Dumping Obstacle Cache");
+				
+				Logger.DBLog.InfoFormat("Dumping Obstacle Cache");
 
 				try
 				{
@@ -247,7 +251,7 @@ namespace FunkyBot
 
 				LBDebug.Items.Add(ObjectCache.cacheSnoCollection.DumpDebugInfo());
 
-				Logging.WriteVerbose("Dumping SNO Cache");
+				Logger.DBLog.InfoFormat("Dumping SNO Cache");
 				try
 				{
 					foreach (var item in ObjectCache.cacheSnoCollection)
@@ -266,21 +270,21 @@ namespace FunkyBot
 			{
 				try
 				{
-					Logging.WriteVerbose("Dumping Character Cache");
+					Logger.DBLog.InfoFormat("Dumping Character Cache");
 
 					LBDebug.Items.Add(Bot.Character.Data.DebugString());
 
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteVerbose("Safely Handled Exception {0}", ex.Message);
+					Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 				}
 			}
 			else if (btnsender.Name == "TargetMove")
 			{
 				try
 				{
-					Logging.Write("TargetMovement: BlockedCounter{0} -- NonMovementCounter{1}", Bot.Targeting.TargetMover.BlockedMovementCounter, Bot.Targeting.TargetMover.NonMovementCounter);
+					Logger.DBLog.InfoFormat("TargetMovement: BlockedCounter{0} -- NonMovementCounter{1}", Bot.Targeting.TargetMover.BlockedMovementCounter, Bot.Targeting.TargetMover.NonMovementCounter);
 				}
 				catch
 				{
@@ -313,7 +317,7 @@ namespace FunkyBot
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteVerbose("Safely Handled Exception {0}", ex.Message);
+							Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 						}
 					}
 
@@ -326,7 +330,7 @@ namespace FunkyBot
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteVerbose("Safely Handled Exception {0}", ex.Message);
+							Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 						}
 					}
 
@@ -341,14 +345,14 @@ namespace FunkyBot
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteVerbose("Safely Handled Exception {0}", ex.Message);
+							Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 						}
 					}
 
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteVerbose("Safely Handled Exception {0}", ex.Message);
+					Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 				}
 
 			}
@@ -356,13 +360,39 @@ namespace FunkyBot
 			{
 				try
 				{
-					LBDebug.Items.Add(DateTime.Now.Subtract(Bot.Game.GoldTimeoutChecker.LastCoinageUpdate).TotalMilliseconds.ToString());
-					LBDebug.Items.Add(Bot.Game.GoldTimeoutChecker.TimeoutTripped.ToString());
+
+					UIElement A = UIElement.FromHash(0x29A8F728B6DDF322);
+					A.Click();
+					//LBDebug.Items.Add("Dumping 0x244BD04C84DF92F1");
+					//foreach (var ui in UIElement.GetChildren(A))
+					//{
+					//	string s = String.Format("Hash: {0}\r\nIsEnabled:{1} IsValid:{2} IsVisible:{3}\r\nName:{4}\r\nHasText{5} Text: {6}",
+					//		ui.Hash.ToString("X"),
+					//		ui.IsEnabled, ui.IsValid, ui.IsVisible,
+					//		ui.Name,
+					//		ui.HasText, ui.Text);
+
+					//	Logger.DBLog.Info(s);
+					//	LBDebug.Items.Add(s);
+					//}
+
+					UIElement B = UIElement.FromHash(0x64EB7B789CFD48EB);
+					LBDebug.Items.Add("Dumping 0x64EB7B789CFD48EB");
+					foreach (var ui in UIElement.GetChildren(B))
+					{
+						string s = String.Format("Hash: {0}\r\nIsEnabled:{1} IsValid:{2} IsVisible:{3}\r\nName:{4}\r\nHasText{5} Text: {6}",
+							ui.Hash.ToString("X"),
+							ui.IsEnabled, ui.IsValid, ui.IsVisible,
+							ui.Name,
+							ui.HasText, ui.Text);
+						Logger.DBLog.Info(s);
+						LBDebug.Items.Add(s);
+					}
 
 				}
-				catch
+				catch(Exception ex)
 				{
-
+					Logger.DBLog.InfoFormat("Safely Handled Exception {0}", ex.Message);
 				}
 			}
 			LBDebug.Items.Refresh();

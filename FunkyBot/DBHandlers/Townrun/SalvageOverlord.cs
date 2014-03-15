@@ -1,14 +1,13 @@
 ﻿using System;
-using FunkyBot.Cache;
 using FunkyBot.Cache.Enums;
 using FunkyBot.Cache.Objects;
-using Zeta;
+using Zeta.Bot;
+using Zeta.Bot.Navigation;
 using Zeta.Common;
-using Zeta.Internals;
+using Zeta.Game;
+using Zeta.Game.Internals;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
-using Zeta.Navigation;
-using Zeta.Internals.Actors;
-using Zeta.CommonBot;
 using System.Linq;
 using System.IO;
 using FunkyBot.Player;
@@ -41,6 +40,7 @@ namespace FunkyBot.DBHandlers
 					// Find out if this item's in a protected bag slot
 					if (!ItemManager.Current.ItemIsProtected(thisitem.ACDItem))
 					{
+						if (thisitem.ThisDBItemType == ItemType.Potion) continue;
 
 						if (Bot.Settings.ItemRules.ItemRulesSalvaging)
 						{
@@ -53,7 +53,7 @@ namespace FunkyBot.DBHandlers
 
 
 
-						//Logging.Write("GilesTrinityScoring == "+Bot.SettingsFunky.ItemRules.ItemRuleGilesScoring.ToString());
+						//Logger.DBLog.InfoFormat("GilesTrinityScoring == "+Bot.SettingsFunky.ItemRules.ItemRuleGilesScoring.ToString());
 
 						bool bShouldVisitSalvage = ItemManager.Current.ShouldStashItem(thisitem.ACDItem);
 
@@ -64,7 +64,7 @@ namespace FunkyBot.DBHandlers
 				}
 				else
 				{
-					Logging.WriteDiagnostic("GSError: Diablo 3 memory read error, or item became invalid [StashOver-1]");
+					Logger.DBLog.DebugFormat("GSError: Diablo 3 memory read error, or item became invalid [StashOver-1]");
 				}
 			}
 
@@ -85,11 +85,11 @@ namespace FunkyBot.DBHandlers
 		{
 			if (Bot.Settings.Debug.DebugStatusBar)
 				BotMain.StatusText = "Town run: Salvage routine started";
-			Logging.WriteDiagnostic("GSDebug: Salvage routine started.");
+			Logger.DBLog.DebugFormat("GSDebug: Salvage routine started.");
 
 			if (ZetaDia.Actors.Me == null)
 			{
-				Logging.WriteDiagnostic("GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]");
+				Logger.DBLog.DebugFormat("GSError: Diablo 3 memory read error, or item became invalid [PreSalvage-1]");
 				return RunStatus.Failure;
 			}
 
@@ -115,7 +115,7 @@ namespace FunkyBot.DBHandlers
 				switch (ZetaDia.CurrentAct)
 				{
 					case Act.A1:
-						vectorSalvageLocation = new Vector3(2949.626f, 2815.065f, 24.04389f); break;
+						vectorSalvageLocation = new Vector3(2958.418f, 2823.037f, 24.04533f); break;
 					case Act.A2:
 						vectorSalvageLocation = new Vector3(289.6358f, 232.1146f, 0.1f); break;
 					case Act.A3:
@@ -212,7 +212,7 @@ namespace FunkyBot.DBHandlers
 
 		internal static RunStatus GilesOptimisedPostSalvage(object ret)
 		{
-			Logging.WriteDiagnostic("GSDebug: Salvage routine ending sequence...");
+			Logger.DBLog.DebugFormat("GSDebug: Salvage routine ending sequence...");
 			if (bLoggedJunkThisStash)
 			{
 				FileStream LogStream;
@@ -226,7 +226,7 @@ namespace FunkyBot.DBHandlers
 				}
 				catch (IOException)
 				{
-					Logging.WriteDiagnostic("Fatal Error: File access error for signing off the junk log file.");
+					Logger.DBLog.DebugFormat("Fatal Error: File access error for signing off the junk log file.");
 				}
 				bLoggedJunkThisStash = false;
 			}
@@ -264,7 +264,7 @@ namespace FunkyBot.DBHandlers
 			}
 
 			iLastDistance = 0f;
-			Logging.WriteDiagnostic("GSDebug: Salvage routine finished.");
+			Logger.DBLog.DebugFormat("GSDebug: Salvage routine finished.");
 			return RunStatus.Success;
 		}
 	}

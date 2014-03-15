@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using FunkyBot.Cache;
 using FunkyBot.Cache.Objects;
 using FunkyBot.Player.HotBar.Skills;
 using FunkyBot.Player.HotBar.Skills.Monk;
-using Zeta;
-using Zeta.Internals.Actors;
 using Zeta.Common;
 using System.Collections.Generic;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 
 namespace FunkyBot.Player.Class
 {
@@ -22,7 +21,7 @@ namespace FunkyBot.Player.Class
 			int InnaSetItemCount = equippedItems.Count(i => i.ThisRealName.Contains("Inna"));
 			if (InnaSetItemCount > 3)
 			{
-				Logging.Write("Monk has full inna set!");
+				Logger.DBLog.InfoFormat("Monk has full inna set!");
 				Bot.Settings.Class.bMonkInnaSet = true;
 			}
 			else
@@ -32,13 +31,13 @@ namespace FunkyBot.Player.Class
 			//Combo Strike???
 			if (HotBar.PassivePowers.Contains(SNOPower.Monk_Passive_CombinationStrike))
 			{
-				Logging.Write("Combination Strike Found!");
+				Logger.DBLog.InfoFormat("Combination Strike Found!");
 				Bot.Settings.Class.bMonkComboStrike = true;
 				int TotalAbilities = HotBar.HotbarPowers.Count(power => SpiritGeneratingAbilities.Contains(power));
 				Bot.Settings.Class.iMonkComboStrikeAbilities = TotalAbilities;
 			}
 
-			Logging.WriteDiagnostic("[Funky] Using Monk Player Class");
+			Logger.DBLog.DebugFormat("[Funky] Using Monk Player Class");
 
 		}
 		public override ActorClass AC { get { return ActorClass.Monk; } }
@@ -168,9 +167,9 @@ namespace FunkyBot.Player.Class
 		enum MonkActiveSkills
 		{
 			Monk_BreathOfHeaven = 69130,
-			Monk_MantraOfRetribution = 69484,
-			Monk_MantraOfHealing = 69490,
-			Monk_MantraOfConviction = 95572,
+			Monk_MantraOfRetribution = 375082,
+			Monk_MantraOfHealing = 373143,
+			Monk_MantraOfConviction = 375088,
 			Monk_FistsofThunder = 95940,
 			Monk_DeadlyReach = 96019,
 			Monk_WaveOfLight = 96033,
@@ -180,13 +179,13 @@ namespace FunkyBot.Player.Class
 			Monk_CripplingWave = 96311,
 			Monk_SevenSidedStrike = 96694,
 			Monk_WayOfTheHundredFists = 97110,
-			Monk_InnerSanctuary = 97222,
+			Monk_InnerSanctuary = 317076,
 			Monk_ExplodingPalm = 97328,
 			Monk_LashingTailKick = 111676,
 			Monk_TempestRush = 121442,
-			Monk_MysticAlly = 123208,
+			Monk_MysticAlly = 362102,
 			Monk_BlindingFlash = 136954,
-			Monk_MantraOfEvasion = 192405,
+			Monk_MantraOfEvasion = 375049,
 			Monk_CycloneStrike = 223473,
 		}
 		/*

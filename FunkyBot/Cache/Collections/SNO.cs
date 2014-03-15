@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FunkyBot.Cache.Objects;
-using Zeta.Common;
 
 namespace FunkyBot.Cache.Collections
 {
@@ -17,7 +16,7 @@ namespace FunkyBot.Cache.Collections
 		public string DumpDebugInfo()
 		{
 			string s = "[SNO Cache] Total: [" + snoEntries.Count + "]";
-			Logging.WriteVerbose(s);
+			//Logger.DBLog.InfoFormat(s);
 			return s;
 		}
 
@@ -39,6 +38,7 @@ namespace FunkyBot.Cache.Collections
 			if (!ObjectCache.dictObstacleType.ContainsKey(key)) ObjectCache.dictObstacleType.Add(key, null);
 			if (!ObjectCache.dictActorSphereRadius.ContainsKey(key)) ObjectCache.dictActorSphereRadius.Add(key, null);
 			if (!ObjectCache.dictGizmoType.ContainsKey(key)) ObjectCache.dictGizmoType.Add(key, null);
+			if (!ObjectCache.dictSnoProperties.ContainsKey(key)) ObjectCache.dictSnoProperties.Add(key, new SNOProperties(key));
 		}
 		private void RemoveDictionaryEntries(int key)
 		{
@@ -56,6 +56,7 @@ namespace FunkyBot.Cache.Collections
 			ObjectCache.dictObstacleType.Remove(key);
 			ObjectCache.dictActorSphereRadius.Remove(key);
 			ObjectCache.dictGizmoType.Remove(key);
+			ObjectCache.dictSnoProperties.Remove(key);
 		}
 
 		#region IDictionary<int,CacheSNO> Members
@@ -163,12 +164,14 @@ namespace FunkyBot.Cache.Collections
 
 			if (UnusedEntries.Count > 0)
 			{
-				Logging.WriteVerbose("Removing Old Unused SNO Entries that have not been used in over 5 mins. Total {0}", UnusedEntries.Count);
+				
 				for (int i = 0; i < UnusedEntries.Count; i++)
 				{
 					Remove(UnusedEntries[i]);
 				}
 			}
+
+			//Logger.DBLog.InfoFormat("Removing Old Unused SNO Entries that have not been used in over 5 mins. Total {0} / Removed {1}",snoEntries.Values.Count, UnusedEntries.Count);
 			lastTrimming = DateTime.Now;
 		}
 
@@ -197,7 +200,7 @@ namespace FunkyBot.Cache.Collections
 		{
 			if (DictionaryEntriesNeedingCleared.Count > 0)
 			{
-				Logging.WriteVerbose("Deleting SNO Dictionary Entries, Total Count {0}", DictionaryEntriesNeedingCleared.Count);
+				//Logger.DBLog.InfoFormat("Deleting SNO Dictionary Entries, Total Count {0}", DictionaryEntriesNeedingCleared.Count);
 				foreach (var item in DictionaryEntriesNeedingCleared)
 				{
 					RemoveDictionaryEntries(item);

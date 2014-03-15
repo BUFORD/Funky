@@ -63,6 +63,20 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cache\CacheUnitIDs.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Cache\SNOProperties.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\SettingsForm.cs">
+      <SubType>Form</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Config\SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="DBHandlers\ExitGame.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -917,19 +931,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Demonbuddy, Version=1.0.1583.325, Culture=neutral, PublicKeyToken=eff32ccf253d66d4, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Demonbuddy">
       <HintPath>Assemblies\Demonbuddy.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="GreyMagic, Version=1.0.1583.325, Culture=neutral, PublicKeyToken=260525fa2b0e778a, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="GreyMagic">
       <HintPath>Assemblies\GreyMagic.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Web" />
@@ -1055,8 +1068,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assemblies\Demonbuddy.exe" />
-    <Content Include="Assemblies\GreyMagic.dll" />
+    <Content Include="Cache\Dictionaries\SNOId_Cache_Units.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="DBHandlers\CharacterMule\NewGame.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1127,7 +1141,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assemblies\" />
     <Folder Include="ItemRules\Log\Archive\" />
+    <Folder Include="Player\HotBar\Skills\Skill Objects\Crusader\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Config\SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

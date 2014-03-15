@@ -3,12 +3,10 @@ using System.Diagnostics;
 using System.Linq;
 using FunkyBot.Cache.Enums;
 using FunkyBot.DBHandlers;
-using FunkyBot.Player;
-using Zeta;
+using Zeta.Bot.Logic;
 using Zeta.Common;
-using Zeta.CommonBot;
-using Zeta.CommonBot.Logic;
-using Zeta.Internals.Actors;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
 using Zeta.TreeSharp;
 
 namespace FunkyBot.Cache.Objects
@@ -203,12 +201,13 @@ namespace FunkyBot.Cache.Objects
 						//Did we have a target last time? and if so was it a goblin?
 						if (Bot.Targeting.LastCachedTarget.RAGUID != -1)
 						{
-							if (CacheIDLookup.hashActorSNOGoblins.Contains(Bot.Targeting.LastCachedTarget.RAGUID))
+							if (Bot.Targeting.LastCachedTarget.IsTreasureGoblin)
 								Weight = 0;
 						}
 						break;
 					case TargetType.Globe:
-						if (Bot.Character.Data.dCurrentHealthPct > Bot.Settings.Combat.GlobeHealthPercent)
+					case TargetType.PowerGlobe:
+						if (targetType.Equals(TargetType.Globe) && Bot.Character.Data.dCurrentHealthPct > Bot.Settings.Combat.GlobeHealthPercent)
 						{
 							Weight = 0;
 						}
@@ -224,6 +223,9 @@ namespace FunkyBot.Cache.Objects
 							// Close items get a weight increase
 							if (centreDistance <= 60f)
 								Weight += 1500d;
+
+							if (targetType == TargetType.PowerGlobe)
+								Weight += 5000d;
 
 							// Was already a target and is still viable, give it some free extra weight, to help stop flip-flopping between two targets
 							if (this == Bot.Targeting.LastCachedTarget && centreDistance <= 25f)
@@ -358,7 +360,10 @@ namespace FunkyBot.Cache.Objects
 						// Ignore it if it's not in range yet
 						if (CentreDistance > LootRadius)
 						{
-							BlacklistLoops = 10;
+							//Blacklist Health Globes 10 loops
+							if (targetType!=TargetType.PowerGlobe)
+								BlacklistLoops = 10;
+
 							return false;
 						}
 					}
@@ -395,6 +400,7 @@ namespace FunkyBot.Cache.Objects
 				{
 					try
 					{
+						
 						DynamicID = ref_DiaObject.CommonData.DynamicId;
 					}
 					catch
@@ -493,7 +499,7 @@ namespace FunkyBot.Cache.Objects
 				#region PickupValidation
 				if (!ShouldPickup.HasValue)
 				{
-					//Logging.Write Dropped Items Here!!
+					//Logger.DBLog.InfoFormat Dropped Items Here!!
 					Bot.Game.CurrentGameStats.CurrentProfile.LootTracker.DroppedItemLog(this);
 					Bot.Character.ItemPickupEval(this);
 					//if (Bot.Settings.ItemRules.UseItemRules)
@@ -583,7 +589,7 @@ namespace FunkyBot.Cache.Objects
 			// Force waiting for global cooldown timer or long-animation abilities
 			if (Bot.Character.Class.PowerPrime.WaitLoopsBefore >= 1)
 			{
-				//Logging.WriteDiagnostic("Debug: Force waiting BEFORE Ability " + powerPrime.powerThis.ToString() + "...");
+				//Logger.DBLog.DebugFormat("Debug: Force waiting BEFORE Ability " + powerPrime.powerThis.ToString() + "...");
 				Bot.Targeting.bWaitingForPower = true;
 				if (Bot.Character.Class.PowerPrime.WaitLoopsBefore >= 1)
 					Bot.Character.Class.PowerPrime.WaitLoopsBefore--;

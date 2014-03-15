@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
 using FunkyBot.Cache.Enums;
 using FunkyBot.Cache.Objects;
 using FunkyBot.Movement;
-using Zeta;
 using Zeta.Common;
-using Zeta.Internals.Actors;
-using Zeta.Internals.SNO;
 using FunkyBot.Cache.Collections;
+using Zeta.Game;
+using Zeta.Game.Internals.Actors;
+using Zeta.Game.Internals.SNO;
 
 namespace FunkyBot.Cache
 {
@@ -20,6 +19,7 @@ namespace FunkyBot.Cache
 	public static class ObjectCache
 	{
 		internal static CacheObject FakeCacheObject;
+		internal static CacheUnitIDs SnoUnitPropertyCache;
 
 		///<summary>
 		///Cached Objects.
@@ -82,7 +82,11 @@ namespace FunkyBot.Cache
 						{
 							tmp_SNOID = thisObj.ActorSNO;
 						}
-						catch (NullReferenceException) { Logging.WriteVerbose("Failure to get SNO from object! RaGUID: {0}", tmp_raGUID); continue; }
+						catch (NullReferenceException) 
+						{ 
+							//Logger.DBLog.InfoFormat("Failure to get SNO from object! RaGUID: {0}", tmp_raGUID); 
+							continue;
+						}
 						#endregion
 
 
@@ -95,7 +99,11 @@ namespace FunkyBot.Cache
 						{
 							tmp_position = thisObj.Position;
 						}
-						catch (NullReferenceException) { Logging.WriteVerbose("Failure to get position vector for RAGUID {0}", tmp_raGUID); continue; }
+						catch (NullReferenceException) 
+						{ 
+							//Logger.DBLog.InfoFormat("Failure to get position vector for RAGUID {0}", tmp_raGUID); 
+							continue;
+						}
 
 						#endregion
 
@@ -104,7 +112,11 @@ namespace FunkyBot.Cache
 						{
 							tmp_acdguid = thisObj.ACDGuid;
 						}
-						catch (NullReferenceException) { Logging.WriteVerbose("Failure to get ACDGUID for RAGUID {0}", tmp_raGUID); continue; }
+						catch (NullReferenceException) 
+						{ 
+							//Logger.DBLog.InfoFormat("Failure to get ACDGUID for RAGUID {0}", tmp_raGUID); 
+							continue;
+						}
 
 						#endregion
 
@@ -142,8 +154,8 @@ namespace FunkyBot.Cache
 							}
 							catch (Exception ex)
 							{
-								Logging.WriteVerbose("[Funky] Safely handled exception getting summoned-by info [" + tmp_CachedObj.SNOID.ToString(CultureInfo.InvariantCulture) + "]");
-								Logging.WriteDiagnostic(ex.ToString());
+								//Logger.DBLog.InfoFormat("[Funky] Safely handled exception getting summoned-by info [" + tmp_CachedObj.SNOID.ToString(CultureInfo.InvariantCulture) + "]");
+								//Logger.DBLog.DebugFormat(ex.ToString());
 								continue;
 							}
 						}
@@ -161,7 +173,7 @@ namespace FunkyBot.Cache
 								else if (CacheIDLookup.hashDHSpikeTraps.Contains(tmp_CachedObj.SNOID) && tmp_CachedObj.CentreDistance <= 50f)
 									Bot.Character.Data.PetData.DemonHunterSpikeTraps++;
 							}
-							else if (Bot.Character.Class.AC == ActorClass.WitchDoctor)
+							else if (Bot.Character.Class.AC == ActorClass.Witchdoctor)
 							{
 								if (CacheIDLookup.hashZombie.Contains(tmp_CachedObj.SNOID))
 									Bot.Character.Data.PetData.ZombieDogs++;
@@ -304,7 +316,7 @@ namespace FunkyBot.Cache
 						{
 							tmp_CachedObj = new CacheItem(tmp_CachedObj);
 						}
-						else if (tmp_CachedObj.Actortype.Value == ActorType.Unit)
+						else if (tmp_CachedObj.Actortype.Value == ActorType.Monster)
 						{
 							tmp_CachedObj = new CacheUnit(tmp_CachedObj);
 						}
@@ -413,6 +425,7 @@ namespace FunkyBot.Cache
 		internal static Dictionary<int, GizmoType?> dictGizmoType = new Dictionary<int, GizmoType?>();
 		internal static Dictionary<int, bool?> dictIsBarricade = new Dictionary<int, bool?>();
 		internal static Dictionary<int, double> dictProjectileSpeed = new Dictionary<int, double>();
+		internal static Dictionary<int,SNOProperties> dictSnoProperties=new Dictionary<int, SNOProperties>(); 
 		#endregion
 
 
