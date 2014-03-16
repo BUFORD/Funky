@@ -1143,7 +1143,6 @@
   <ItemGroup>
     <Folder Include="Assemblies\" />
     <Folder Include="ItemRules\Log\Archive\" />
-    <Folder Include="Player\HotBar\Skills\Skill Objects\Crusader\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Config\SettingsForm.resx">
