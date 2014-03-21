@@ -8,17 +8,18 @@ namespace FunkyBot.Player.HotBar.Skills.Monk
 	 {
 		 public override void Initialize()
 		  {
-				Cooldown=30200;
+				Cooldown=RuneIndex==3?17200:30200;
 				ExecutionType=AbilityExecuteFlags.Location;
 				WaitVars=new WaitLoops(2, 3, true);
 				Cost=50;
 				Range=16;
 				Priority=AbilityPriority.Medium;
 				UseageType=AbilityUseage.Combat;
-				PreCast=new SkillPreCast((AbilityPreCastFlags.CheckEnergy|AbilityPreCastFlags.CheckCanCast|
-				                          AbilityPreCastFlags.CheckRecastTimer|AbilityPreCastFlags.CheckPlayerIncapacitated));
-				ElitesWithinRangeConditions=new Tuple<RangeIntervals, int>(RangeIntervals.Range_25, 1);
-				SingleUnitCondition=new UnitTargetConditions(TargetProperties.IsSpecial, 15);
+				PreCast=new SkillPreCast((AbilityPreCastFlags.CheckEnergy|AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated));
+
+				UnitsWithinRangeConditions = new Tuple<RangeIntervals, int>(RangeIntervals.Range_20, 6);
+			    ElitesWithinRangeConditions=new Tuple<RangeIntervals, int>(RangeIntervals.Range_20, 3);
+				SingleUnitCondition=new UnitTargetConditions(TargetProperties.None, 15, falseConditionalFlags: TargetProperties.Normal); //any non-normal unit!
 
 
 				FcriteriaCombat=() => !Bot.Character.Class.bWaitingForSpecial||Bot.Character.Data.dCurrentEnergy>=Bot.Character.Class.iWaitingReservedAmount;

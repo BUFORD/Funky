@@ -224,9 +224,9 @@ namespace FunkyBot.Player
 						if (item.BalanceData.iThisItemLevel == 63 && Bot.Settings.Loot.PickupDemonicEssence)
 							return true;
 
-						return item.BalanceData.iThisItemLevel < Bot.Settings.Loot.MiscItemLevel;
+						return Bot.Settings.Loot.PickupCraftMaterials;
 					}
-					if (thisGilesItemType == GilesItemType.CraftTome && (item.BalanceData.iThisItemLevel < Bot.Settings.Loot.MiscItemLevel || !Bot.Settings.Loot.PickupCraftTomes))
+					if (thisGilesItemType == GilesItemType.CraftTome && !Bot.Settings.Loot.PickupCraftTomes)
 					{
 						return false;
 					}
@@ -372,6 +372,7 @@ namespace FunkyBot.Player
 			if (sThisInternalName.StartsWith("dye_")) return GilesItemType.Dye;
 			if (sThisInternalName.StartsWith("a1_")) return GilesItemType.SpecialItem;
 			if (sThisInternalName.StartsWith("healthglobe")) return GilesItemType.HealthGlobe;
+			if (sThisInternalName.StartsWith("craftingreagent")) return GilesItemType.CraftingMaterial;
 
 			// Follower item types
 			if (sThisInternalName.StartsWith("jewelbox_") || DBItemType == ItemType.FollowerSpecial)
@@ -474,7 +475,7 @@ namespace FunkyBot.Player
 				thisGilesBaseType = GilesBaseItemType.Misc;
 			}
 			else if (thisGilesItemType == GilesItemType.Ruby || thisGilesItemType == GilesItemType.Emerald || thisGilesItemType == GilesItemType.Topaz ||
-				 thisGilesItemType == GilesItemType.Amethyst)
+				 thisGilesItemType == GilesItemType.Amethyst || thisGilesItemType == GilesItemType.Diamond)
 			{
 				thisGilesBaseType = GilesBaseItemType.Gem;
 			}
@@ -491,7 +492,7 @@ namespace FunkyBot.Player
 		internal static bool DetermineIsStackable(GilesItemType thisGilesItemType)
 		{
 			bool bIsStackable = thisGilesItemType == GilesItemType.CraftingMaterial || thisGilesItemType == GilesItemType.CraftTome || thisGilesItemType == GilesItemType.Ruby ||
-									  thisGilesItemType == GilesItemType.Emerald || thisGilesItemType == GilesItemType.Topaz || thisGilesItemType == GilesItemType.Amethyst ||
+									  thisGilesItemType == GilesItemType.Diamond || thisGilesItemType == GilesItemType.Emerald || thisGilesItemType == GilesItemType.Topaz || thisGilesItemType == GilesItemType.Amethyst ||
 									  thisGilesItemType == GilesItemType.HealthPotion || thisGilesItemType == GilesItemType.CraftingPlan || thisGilesItemType == GilesItemType.Dye ||
 									  thisGilesItemType == GilesItemType.InfernalKey;
 			return bIsStackable;
@@ -500,7 +501,7 @@ namespace FunkyBot.Player
 		{
 			GilesItemType thisGilesItemType = DetermineItemType(item.ThisInternalName, item.ThisDBItemType, item.ThisFollowerType);
 			bool bIsStackable = thisGilesItemType == GilesItemType.CraftingMaterial || thisGilesItemType == GilesItemType.CraftTome || thisGilesItemType == GilesItemType.Ruby ||
-									  thisGilesItemType == GilesItemType.Emerald || thisGilesItemType == GilesItemType.Topaz || thisGilesItemType == GilesItemType.Amethyst ||
+									  thisGilesItemType == GilesItemType.Diamond || thisGilesItemType == GilesItemType.Emerald || thisGilesItemType == GilesItemType.Topaz || thisGilesItemType == GilesItemType.Amethyst ||
 									  thisGilesItemType == GilesItemType.HealthPotion || thisGilesItemType == GilesItemType.CraftingPlan || thisGilesItemType == GilesItemType.Dye ||
 									  thisGilesItemType == GilesItemType.InfernalKey;
 			return bIsStackable;
@@ -2068,7 +2069,7 @@ namespace FunkyBot.Player
 
 
 			//We refresh our BPItem Cache whenever we are checking for looted items!
-			if (Bot.Targeting.ShouldCheckItemLooted)
+			if (Bot.Targeting.Cache.ShouldCheckItemLooted)
 			{
 				//Get a list of current BP Cached ACDItems
 				List<int> BPItemsACDItemList = (from backpackItems in BPItems

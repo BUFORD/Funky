@@ -24,9 +24,9 @@ namespace FunkyBot.Player.HotBar.Skills.Barb
             PreCast = new SkillPreCast((AbilityPreCastFlags.CheckEnergy | AbilityPreCastFlags.CheckExisitingBuff |
                                       AbilityPreCastFlags.CheckCanCast));
 
-            FcriteriaCombat = () => Bot.Targeting.Environment.iElitesWithinRange[(int)RangeIntervals.Range_15] > 0
-                                  || (Bot.Settings.Class.bBarbUseWOTBAlways && Bot.Targeting.Environment.SurroundingUnits > 1)
-                                  || (Bot.Settings.Class.bGoblinWrath && Bot.Targeting.CurrentTarget.IsTreasureGoblin);
+            FcriteriaCombat = () => Bot.Targeting.Cache.Environment.iElitesWithinRange[(int)RangeIntervals.Range_15] > 0
+                                  || (Bot.Settings.Class.bBarbUseWOTBAlways && Bot.Targeting.Cache.Environment.SurroundingUnits > 1)
+                                  || (Bot.Settings.Class.bGoblinWrath && Bot.Targeting.Cache.CurrentTarget.IsTreasureGoblin);
         }
 
         #region IAbility

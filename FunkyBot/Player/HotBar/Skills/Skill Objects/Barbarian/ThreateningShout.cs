@@ -21,7 +21,7 @@ namespace FunkyBot.Player.HotBar.Skills.Barb
 				UseageType=AbilityUseage.Anywhere;
 				Priority=AbilityPriority.Medium;
 				PreCast=new SkillPreCast((AbilityPreCastFlags.CheckRecastTimer|AbilityPreCastFlags.CheckCanCast|AbilityPreCastFlags.CheckPlayerIncapacitated));
-				FcriteriaCombat=() => (Bot.Targeting.Environment.iAnythingWithinRange[(int)RangeIntervals.Range_20] > 2);
+				FcriteriaCombat=() => (Bot.Targeting.Cache.Environment.iAnythingWithinRange[(int)RangeIntervals.Range_20] > 2);
 		  }
 
 		  #region IAbility

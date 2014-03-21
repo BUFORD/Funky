@@ -31,7 +31,7 @@ namespace FunkyBot.Targeting.Behaviors
 				//Check objects added for LOS movement
 				return Bot.Settings.LOSMovement.EnableLOSMovementBehavior &&
 					!Bot.IsInNonCombatBehavior &&
-					(Bot.Targeting.Environment.LoSMovementObjects.Count > 0 || Bot.NavigationCache.LOSmovementObject != null);
+					(Bot.Targeting.Cache.Environment.LoSMovementObjects.Count > 0 || Bot.NavigationCache.LOSmovementObject != null);
 			}
 		}
 
@@ -42,19 +42,18 @@ namespace FunkyBot.Targeting.Behaviors
 				if (obj == null)
 				{
 					if (Bot.NavigationCache.LOSmovementObject != null &&
-						//((Bot.Targeting.LastCachedTarget!=null&&Bot.Targeting.LastCachedTarget.Equals(Bot.NavigationCache.LOSmovementObject))||
-						(Bot.NavigationCache.LOSmovementObject.CentreDistance < 50f && !Bot.NavigationCache.LOSmovementObject.IsStillValid()))
+						//((Bot.Targeting.Cache.LastCachedTarget!=null&&Bot.Targeting.Cache.LastCachedTarget.Equals(Bot.NavigationCache.LOSmovementObject))||
+						(Bot.NavigationCache.LOSmovementObject.CentreDistance < 50f && !Bot.NavigationCache.LOSmovementObject.CacheContainsOrginObject()))
 					{//Invalidated the Line of sight obj!
 
 
 						Logger.Write(LogLevel.Movement, "LOS Object is No Longer Valid -- Reseting.");
 
 
-						Bot.NavigationCache.LOSBlacklistedRAGUIDs.Add(Bot.NavigationCache.LOSmovementObject.RAGUID);
-						Bot.NavigationCache.LOSVector = Vector3.Zero;
+						Bot.NavigationCache.LOSBlacklistedRAGUIDs.Add(Bot.NavigationCache.LOSmovementObject.OrginCacheObjectRAGUID);
 						Bot.NavigationCache.LOSmovementObject = null;
 
-						if (Bot.Targeting.LastCachedTarget.targetType.Value == TargetType.LineOfSight)
+						if (Bot.Targeting.Cache.LastCachedTarget.targetType.Value == TargetType.LineOfSight)
 							Navigation.NP.Clear();
 					}
 
@@ -62,8 +61,8 @@ namespace FunkyBot.Targeting.Behaviors
 					if (Bot.NavigationCache.LOSmovementObject == null)
 					{//New LOS Movement Selection.
 
-						Bot.Targeting.Environment.LoSMovementObjects = Bot.Targeting.Environment.LoSMovementObjects.OrderBy(o => o.CentreDistance).ToList();
-						foreach (var cobj in Bot.Targeting.Environment.LoSMovementObjects)
+						Bot.Targeting.Cache.Environment.LoSMovementObjects = Bot.Targeting.Cache.Environment.LoSMovementObjects.OrderBy(o => o.CentreDistance).ToList();
+						foreach (var cobj in Bot.Targeting.Cache.Environment.LoSMovementObjects)
 						{//Iterate Units
 
 							if (Bot.NavigationCache.LOSBlacklistedRAGUIDs.Contains(cobj.RAGUID)) continue;
@@ -76,8 +75,7 @@ namespace FunkyBot.Targeting.Behaviors
 							Bot.NavigationCache.LOSBlacklistedRAGUIDs.Add(cobj.RAGUID);
 
 							//Set the object
-							Bot.NavigationCache.LOSmovementObject = new CacheObject(cobj);
-							Bot.NavigationCache.LOSVector = cobj.Position;
+							Bot.NavigationCache.LOSmovementObject = new CacheLineOfSight(cobj, cobj.Position);
 							break;
 						}
 
@@ -86,15 +84,27 @@ namespace FunkyBot.Targeting.Behaviors
 					if (Bot.NavigationCache.LOSmovementObject != null)
 					{//Line of Sight unit is valid
 
-						//Generate the path here so we can start moving..
-						//if (Navigation.NP.CurrentPath.Count == 0)
-						Navigation.NP.Clear();
-						Navigation.NP.MoveTo(Bot.NavigationCache.LOSVector, "01 LOS:" + Bot.NavigationCache.LOSmovementObject.InternalName, true);
+						//See if the orgin object is still valid..
+						if (Bot.NavigationCache.LOSmovementObject.CentreDistance<75f)
+						{
+							if (!Bot.NavigationCache.LOSmovementObject.CacheContainsOrginObject())
+							{
+								Logger.Write(LogLevel.Movement, "Line of Sight Ending due to Orgin Object No Longer Available!");
+								Bot.NavigationCache.LOSmovementObject = null;
+								return false;
+							}
+							else
+							{
+								//Update Position using Orgin Object?
+								Bot.NavigationCache.LOSmovementObject.UpdateOrginObject();
+							}
+						}
 
+						Navigation.NP.MoveTo(Bot.NavigationCache.LOSmovementObject.Position, "LOS", true);
 						if (Navigation.NP.CurrentPath.Count > 0)
 						{
 							//Setup a temp target that the handler will use
-							obj = new CacheObject(Bot.NavigationCache.LOSVector, TargetType.LineOfSight, 1d, Bot.NavigationCache.LOSmovementObject.InternalName, Navigation.NP.PathPrecision);
+							obj = new CacheObject(Bot.NavigationCache.LOSmovementObject.Position, TargetType.LineOfSight, 1d, "LOS Movement", Navigation.NP.PathPrecision);
 							return true;
 						}
 					}

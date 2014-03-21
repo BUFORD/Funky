@@ -10,6 +10,7 @@ using Demonbuddy;
 using FunkyBot.Cache;
 using FunkyBot.Cache.Enums;
 using FunkyBot.Cache.Objects;
+using FunkyBot.Misc;
 using Zeta.Bot;
 using Zeta.Bot.Logic;
 using Zeta.Bot.Navigation;
@@ -26,7 +27,7 @@ namespace FunkyBot
 {
 	public partial class Funky : IPlugin
 	{
-		public Version Version { get { return new Version(2, 8, 0, 2); } }
+		public Version Version { get { return new Version(2, 8, 1, 0); } }
 		public string Author { get { return "Herbfunk"; } }
 		public string Description
 		{
@@ -185,6 +186,19 @@ namespace FunkyBot
 			Bot.Character.Account.UpdateCurrentAccountDetails();
 			Logger.DBLogFile = DateTime.Now.ToString("yyyy-MM-dd hh.mm") + ".txt";
 			Logger.Write(LogLevel.User, "Init Logger Completed!");
+
+			//Generate Checksum for Update Check
+			Process.Start(FolderPaths.sTrinityPluginPath + @"\CheckSum.exe");
+			if (Updater.UpdateAvailable())
+			{
+				string dbPathString = Assembly.GetEntryAssembly().Location;
+				string dbExePath = Path.GetFullPath(dbPathString);
+				Process.GetCurrentProcess().CloseMainWindow();
+				Process.Start(dbExePath);
+				return;
+			}
+
+			//test
 		}
 
 		public void OnPulse()
@@ -229,9 +243,9 @@ namespace FunkyBot
 				//
 				string CompileDateString = PluginInfo.LastWriteTime.ToString("MM/dd hh:mm:ss tt", CultureInfo.InvariantCulture);
 				Logger.DBLog.InfoFormat("************************************");
-				Logger.DBLog.InfoFormat("ENABLED: Funky Bot Plugin");
+				Logger.DBLog.InfoFormat("Funky Bot Plugin -- Enabled!");
 				Logger.DBLog.InfoFormat(" -- Version -- " + Version);
-				Logger.DBLog.InfoFormat("\tModified: " + CompileDateString);
+				Logger.DBLog.InfoFormat("Modified: " + CompileDateString);
 				Logger.DBLog.InfoFormat("************************************");
 
 				//string profile=Zeta.CommonBot.ProfileManager.CurrentProfile!=null?Zeta.CommonBot.ProfileManager.CurrentProfile.Name:Zeta.CommonBot.Settings.GlobalSettings.Instance.LastProfile;

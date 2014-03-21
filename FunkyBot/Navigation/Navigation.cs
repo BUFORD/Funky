@@ -205,7 +205,7 @@ namespace FunkyBot.Movement
 			}
 
 			List<int> NearbyObjectRAGUIDs = new List<int>();
-			List<CacheServerObject> NearbyObjects = Bot.Targeting.Environment.NearbyObstacleObjects.Where(obj => obj.RadiusDistance <= 6f).ToList();//ObjectCache.Obstacles.Navigations.Where(obj => obj.RadiusDistance<=5f).ToList();
+			List<CacheServerObject> NearbyObjects = Bot.Targeting.Cache.Environment.NearbyObstacleObjects.Where(obj => obj.RadiusDistance <= 6f).ToList();//ObjectCache.Obstacles.Navigations.Where(obj => obj.RadiusDistance<=5f).ToList();
 
 			//no nearby objects passed distance check..
 			if (NearbyObjects.Count == 0)
@@ -605,8 +605,7 @@ namespace FunkyBot.Movement
 		#endregion
 
 		#region Line of Sight Movement
-		internal CacheObject LOSmovementObject = null;
-		internal Vector3 LOSVector = Vector3.Zero;
+		internal CacheLineOfSight LOSmovementObject = null;
 		internal List<int> LOSBlacklistedRAGUIDs = new List<int>();
 		#endregion
 
@@ -624,7 +623,7 @@ namespace FunkyBot.Movement
 			{
 				RefreshMovementCache();
 
-				if (!IsMoving || currentMovementState.Equals(MovementState.WalkingInPlace) || currentMovementState.Equals(MovementState.None) || Bot.Targeting.TargetMover.BlockedMovementCounter > 0)
+				if (!IsMoving || currentMovementState.Equals(MovementState.WalkingInPlace) || currentMovementState.Equals(MovementState.None) || Bot.Targeting.Movement.BlockedMovementCounter > 0)
 				{
 					LastObstacleIntersectionTest = DateTime.Now;
 
@@ -632,7 +631,7 @@ namespace FunkyBot.Movement
 					if (Funky.PlayerMover.iTotalAntiStuckAttempts > 0) range += (Funky.PlayerMover.iTotalAntiStuckAttempts * 5f);
 
 					//get collection of objects that pass the tests.
-					var intersectingObstacles = Bot.Targeting.Environment.NearbyObstacleObjects //ObjectCache.Obstacles.Values.OfType<CacheServerObject>()
+					var intersectingObstacles = Bot.Targeting.Cache.Environment.NearbyObstacleObjects //ObjectCache.Obstacles.Values.OfType<CacheServerObject>()
 																			  .Where(obstacle =>
 																					!PrioritizedRAGUIDs.Contains(obstacle.RAGUID)//Only objects not already prioritized
 																					&& obstacle.Obstacletype.HasValue
